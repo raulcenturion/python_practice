@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+.vscode/
+*.log
+app.log
+data.json
+data.xml
+ejemplo.txt
+ejemplo_escritura.txt
+nota.json
