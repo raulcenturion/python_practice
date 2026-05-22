@@ -97,7 +97,106 @@ print(cuenta1.mostrar_saldo())
 # Se usa comúnmente en clases o funciones que aún no se han implementado.
 class ClaseVacia:
     pass
-# Crear una instancia de la clase ClaseVacia
 clase_vacia = ClaseVacia()
 print("Instancia de clase vacía creada:", clase_vacia)
-# Fin de la clase sobre clases
+
+# ============================
+# 🔹 @classmethod y @staticmethod
+# ============================
+# @classmethod: recibe la clase (cls) como primer argumento. Puede modificar atributos de clase.
+# @staticmethod: NO recibe ni self ni cls. Es una función normal que vive dentro de la clase.
+
+class Persona2:
+    especie = "Humano"  # Atributo de clase (compartido por todas las instancias)
+
+    def __init__(self, nombre, edad):
+        self.nombre = nombre
+        self.edad = edad
+
+    @classmethod
+    def cambiar_especie(cls, nueva_especie):
+        """Modifica el atributo de clase para TODAS las instancias."""
+        cls.especie = nueva_especie
+
+    @staticmethod
+    def es_mayor(edad):
+        """No necesita acceso a la instancia ni a la clase."""
+        return edad >= 18
+
+p1 = Persona2("Raúl", 33)
+p2 = Persona2("Ana", 25)
+
+print(p1.especie)  # Humano
+print(p2.especie)  # Humano
+
+Persona2.cambiar_especie("Reptiliano")  # Cambia para TODOS
+print(p1.especie)  # Reptiliano
+print(p2.especie)  # Reptiliano
+
+print(Persona2.es_mayor(20))      # True (se llama desde la clase)
+print(p1.es_mayor(p1.edad))       # True (también desde la instancia)
+
+# ============================
+# 🔹 Abstracción con ABC (clase abstracta)
+# ============================
+from abc import ABC, abstractmethod
+
+class CuentaBancaria2(ABC):
+    def __init__(self, titular, saldo_inicial):
+        self.titular = titular
+        self.__saldo = saldo_inicial
+
+    def depositar(self, monto):
+        if monto > 0:
+            self.__saldo += monto
+
+    def _get_saldo(self):
+        return self.__saldo
+
+    def _set_saldo(self, nuevo):
+        self.__saldo = nuevo
+
+    @abstractmethod
+    def retirar(self, monto):
+        pass  # Cada subclase DEBE implementar este método (polimorfismo)
+
+    def ver_saldo(self):
+        return f"Saldo: ${self.__saldo}"
+
+class CuentaAhorro(CuentaBancaria2):
+    def retirar(self, monto):
+        penalidad = monto * 0.05  # 5% de penalidad
+        total = monto + penalidad
+        if total <= self._get_saldo():
+            self._set_saldo(self._get_saldo() - total)
+        else:
+            print("Fondos insuficientes en cuenta de ahorro")
+
+class CuentaNomina(CuentaBancaria2):
+    def retirar(self, monto):
+        if monto <= self._get_saldo():
+            self._set_saldo(self._get_saldo() - monto)
+        else:
+            print("Fondos insuficientes en cuenta de nómina")
+
+ahorro = CuentaAhorro("Raúl", 1000)
+nomina = CuentaNomina("Raúl", 1000)
+ahorro.retirar(100)
+nomina.retirar(100)
+print("Ahorro:", ahorro.ver_saldo())  # $895.0 (100 + 5% penalidad)
+print("Nómina:", nomina.ver_saldo())  # $900.0
+
+# ============================
+# 🔹 Resumen POO
+# ============================
+# - Clase: plantilla para crear objetos (class NombreClase)
+# - __init__: constructor, se ejecuta al crear una instancia
+# - self: referencia a la instancia actual
+# - Atributos de instancia: propios de cada objeto (self.x)
+# - Atributos de clase: compartidos por todas las instancias (Clase.x)
+# - Encapsulamiento: __privado (name mangling), _protegido (convención)
+# - @classmethod: método que recibe la clase (cls), puede modificar atributos de clase
+# - @staticmethod: función utilitaria dentro de la clase, sin acceso a self ni cls
+# - Herencia: class Hija(Padre) → hereda atributos y métodos
+# - Polimorfismo: misma interfaz, diferente implementación
+# - ABC + @abstractmethod: obliga a las subclases a implementar métodos
