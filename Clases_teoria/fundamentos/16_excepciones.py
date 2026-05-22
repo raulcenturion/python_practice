@@ -54,33 +54,14 @@ try:
     verificar_edad(-5)
 except AssertionError as e:
     print("Error de aserción:", e)
-# Las excepciones ayudan a identificar y manejar errores de manera controlada, mejorando la calidad del código.
-# Es una buena práctica registrar las excepciones para facilitar la depuración y el mantenimiento del código.
-# Se pueden usar módulos como `logging` para registrar excepciones y otros eventos importantes en un archivo de log.
-import logging
-logging.basicConfig(filename='app.log', level=logging.ERROR)
-#try:
- #   resultado = 10 / 0
-#except ZeroDivisionError as e:
-    #logging.error("Excepción capturada: %s", e)
- #   def interna(y):
-    #    return x + y
-    #return interna(x * 2)
-# print("Función anidada:", externa(5))# Fin de la clase sobre excepciones
-## Mas sobre excepciones
-###
-# 05 - Excepciones
-# Manejo de errores y situaciones excepcionales en el código
-### Ejemplo de manejo de excepciones
-try:
-    # Código que puede generar una excepción
-    resultado = 10 / 0
-except ZeroDivisionError:
-    # Código que se ejecuta si ocurre una excepción
-    print("Error: División por cero no permitida.")
-else:
-    # Código que se ejecuta si no ocurre ninguna excepción
-    print("El resultado es:", resultado)
-finally:
-    # Código que se ejecuta siempre, ocurra o no una excepción
-    print("Bloque finally ejecutado.")
+
+# ============================
+# 🔹 Resumen
+# ============================
+# - try: código que puede fallar
+# - except: captura el error específico
+# - else: se ejecuta si NO hubo error
+# - finally: se ejecuta SIEMPRE (ideal para cerrar archivos, conexiones, etc.)
+# - raise: lanza una excepción manualmente
+# - Se pueden crear excepciones personalizadas heredando de Exception
+# - assert: verifica condiciones, lanza AssertionError si es False

@@ -78,13 +78,8 @@ else:
 # ===============================
 # 🔹 Buenas Prácticas y Recomendaciones
 # ===============================
-# - Trabajar con ficheros es fundamental para aplicaciones que manejan datos o configuraciones.
-# - Evita pérdidas de datos y asegura la integridad de la información con buenas prácticas.
-# - Considera la legibilidad y mantenibilidad del código al elegir enfoques para manejar ficheros.
-# - Practica con ejemplos y distintos modos de apertura para consolidar conceptos.
-# - Consulta la documentación oficial y otros recursos para profundizar.
-# - Probar y validar tu código es clave, ya que las operaciones de ficheros pueden afectar datos importantes.
-# - Dominar el manejo de ficheros en Python es esencial para escribir aplicaciones robustas y eficientes.
+# 🔹 Ejemplo práctico completo
+# ===============================
 
 import os
 

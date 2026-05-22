@@ -38,21 +38,11 @@ print(isinstance(perro, Animal))  # True
 print(isinstance(gato, Animal))    # True
 print(isinstance(perro, Perro))    # True
 print(isinstance(gato, Perro))      # False
-# Resumen:
-# - La herencia permite reutilizar código y crear jerarquías de clases.
-# - El polimorfismo permite tratar objetos de diferentes clases de manera uniforme.
-# - Es importante diseñar clases base con métodos que las subclases deben implementar.
-# - La función `isinstance()` es útil para verificar el tipo de una instancia.
-# - La herencia múltiple es posible en Python, pero debe usarse con precaución para evitar complicaciones.
-# - Los métodos y atributos de la clase base pueden ser sobrescritos en las clases derivadas.
-# - Se pueden llamar métodos de la clase base desde una clase derivada usando `super()`.
-# - La herencia y el polimorfismo son conceptos fundamentales en la programación orientada a objetos.
-# - Estos conceptos ayudan a crear código más modular, reutilizable y mantenible.
-# - Es recomendable seguir principios de diseño como SOLID para aprovechar al máximo la herencia y el polimorfismo.
-# - La documentación y los comentarios son importantes para entender la jerarquía de clases y las relaciones entre ellas.
-# - La herencia puede facilitar la extensión de funcionalidades sin modificar el código existente.
-# - El polimorfismo permite escribir funciones y métodos que pueden trabajar con diferentes tipos de objetos.
-# - Es importante probar las clases y sus interacciones para asegurar que funcionan correctamente.
-# - La comprensión de estos conceptos es esencial para cualquier desarrollador que trabaje con programación orientada a objetos.
-# - La práctica y la experiencia son clave para dominar la herencia y el polimorfismo en Python.
-# - No dudes en consultar la documentación oficial de Python y otros recursos para profundizar en estos temas.
+# ============================
+# 🔹 Resumen
+# ============================
+# - Herencia: una clase hija hereda atributos y métodos de la clase padre
+# - Polimorfismo: distintas clases pueden tener el mismo método con comportamiento diferente
+# - super().__init__(): llama al constructor de la clase padre
+# - isinstance(): verifica si un objeto es instancia de una clase
+# - raise NotImplementedError: obliga a las subclases a implementar un método
