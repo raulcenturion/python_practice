@@ -12,7 +12,7 @@ Clases_teoria/     → teoría por tema
   regex/
   scraping/
 
-02_practicas/      → ejercicios y enunciados (espejo de la teoría)
+Ejercicios/        → enunciados y prácticas (espejo de la teoría)
   fundamentos/
   fechas/
   logica/
@@ -23,12 +23,12 @@ Clases_teoria/     → teoría por tema
 ## Cómo estudiar
 
 1. Leé el tema en `Clases_teoria/<tema>/...`
-2. Resolvé el archivo correspondiente en `02_practicas/<tema>/...`
-3. Cada práctica apunta a su teoría en el encabezado (`📘 Teoría: ...`)
+2. Resolvé el archivo correspondiente en `Ejercicios/<tema>/...`
+3. Cada ejercicio apunta a su teoría en el encabezado (`📘 Teoría: ...`)
 
 ## Fundamentos (orden sugerido)
 
-| Práctica | Teoría |
+| Ejercicio | Teoría |
 |----------|--------|
 | `01_print.py` | `01_print_comentarios.py` |
 | `02_tipos_de_datos.py` | `02_tipos_de_datos.py` |
