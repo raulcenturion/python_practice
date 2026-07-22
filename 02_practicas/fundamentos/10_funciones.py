@@ -1,6 +1,6 @@
 # ============================
 # 📝 Ejercicios: Funciones
-# 📘 Teoría: fundamentos/13_funciones.py
+# 📘 Teoría: Clases_teoria/fundamentos/13_funciones.py
 # ============================
 
 # 🔸 Ejemplo:

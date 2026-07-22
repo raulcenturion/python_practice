@@ -1,6 +1,6 @@
 # ============================
 # 📝 Ejercicios: Módulos, Ficheros, JSON
-# 📘 Teoría: fundamentos/17_modulos.py + 20_ficheros.py + 21_json_xml.py
+# 📘 Teoría: Clases_teoria/fundamentos/17_modulos.py + 20_ficheros.py + 21_json_xml.py
 # ============================
 
 # 🔸 Ejemplo:

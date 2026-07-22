@@ -1,6 +1,6 @@
 # ============================
 # 📝 Ejercicios: For y Rangos
-# 📘 Teoría: fundamentos/11_for.py + 12_rangos.py
+# 📘 Teoría: Clases_teoria/fundamentos/11_for.py + 12_rangos.py
 # ============================
 
 # 🔸 Ejemplo:

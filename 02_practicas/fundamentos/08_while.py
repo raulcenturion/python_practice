@@ -1,6 +1,6 @@
 # ============================
 # 📝 Ejercicios: While
-# 📘 Teoría: fundamentos/10_while.py
+# 📘 Teoría: Clases_teoria/fundamentos/10_while.py
 # ============================
 
 # 🔸 Ejemplo:

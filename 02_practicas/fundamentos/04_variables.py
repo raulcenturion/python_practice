@@ -1,6 +1,6 @@
 # ============================
 # 📝 Ejercicios: Variables
-# 📘 Teoría: fundamentos/04_variables.py
+# 📘 Teoría: Clases_teoria/fundamentos/04_variables.py
 # ============================
 
 # 🔸 Ejemplo:

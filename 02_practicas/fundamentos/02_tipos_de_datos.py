@@ -1,15 +1,26 @@
 # ============================
 # 📝 Ejercicios: Tipos de Datos
-# 📘 Teoría: fundamentos/02_tipos_de_datos.py
+# 📘 Teoría: Clases_teoria/fundamentos/02_tipos_de_datos.py
 # ============================
 
 # 🔸 Ejemplo:
 # type() te dice el tipo de dato de cualquier valor
-print(type(42))        # <class 'int'>
-print(type("hola"))    # <class 'str'>
-print(type([1, 2]))    # <class 'list'>
+numero = 10
+decimal = 3.14
+texto = "Hola mundo"
+activo = True
+lista = [1, 2, 3]
+
+print(numero, type(numero))
+print(decimal, type(decimal))
+print(texto, type(texto))
+print(activo, type(activo))
+print(lista, type(lista))
 
 # ============================
+# ENUNCIADOS
+# ============================
+
 # Ejercicio 1: Todos los tipos
 # Creá una variable de cada tipo: str, int, float, bool, list, tuple, dict, set
 # Imprimí el type() de cada una.
@@ -32,4 +43,3 @@ print(type([1, 2]))    # <class 'list'>
 # Ejercicio 5: Diccionario personal
 # Creá un diccionario con tus datos (nombre, edad, hobbies como lista)
 # Imprimí su type() y el type() de cada valor.
-

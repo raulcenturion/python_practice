@@ -1,17 +1,23 @@
 # ============================
 # 📝 Ejercicios: Operaciones Aritméticas
-# 📘 Teoría: fundamentos/04_variables.py (operadores)
+# 📘 Teoría: Clases_teoria/fundamentos/04_variables.py (operadores)
 # ============================
 
 # 🔸 Ejemplo:
 a = 15
 b = 4
-print(f"{a} + {b} = {a + b}")      # Suma: 19
-print(f"{a} // {b} = {a // b}")    # División entera: 3
-print(f"{a} % {b} = {a % b}")      # Módulo (resto): 3
-print(f"{a} ** {b} = {a ** b}")    # Potencia: 50625
+print("Suma:", a + b)
+print("Resta:", a - b)
+print("Multiplicación:", a * b)
+print("División:", a / b)
+print("División entera:", a // b)
+print("Módulo (resto):", a % b)
+print("Potencia:", a ** b)
 
 # ============================
+# ENUNCIADOS
+# ============================
+
 # Ejercicio 1: Los 7 operadores
 # Pedí dos números al usuario y mostrá: +, -, *, /, //, %, **
 
@@ -22,6 +28,7 @@ print(f"{a} ** {b} = {a ** b}")    # Potencia: 50625
 
 # Ejercicio 3: Área del círculo
 # Calculá el área de un círculo con radio = 5 (area = pi * radio ** 2)
+# Usá pi = 3.14159
 
 
 # Ejercicio 4: Descomponer segundos
@@ -35,4 +42,3 @@ print(f"{a} ** {b} = {a ** b}")    # Potencia: 50625
 
 # Ejercicio 6: Conversión de temperatura
 # Pedí la temperatura en Celsius y convertila a Fahrenheit: F = C * 9/5 + 32
-

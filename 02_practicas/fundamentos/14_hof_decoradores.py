@@ -1,6 +1,6 @@
 # ============================
 # 📝 Ejercicios: HOF y Decoradores
-# 📘 Teoría: fundamentos/24_hof.py + 25_decoradores.py
+# 📘 Teoría: Clases_teoria/fundamentos/24_hof.py + 25_decoradores.py
 # ============================
 
 # 🔸 Ejemplo:

@@ -1,6 +1,6 @@
 # ============================
 # 📝 Ejercicios: Condicionales y Booleanos
-# 📘 Teoría: fundamentos/06_condicionales.py + 07_booleanos.py
+# 📘 Teoría: Clases_teoria/fundamentos/06_condicionales.py + 07_booleanos.py
 # ============================
 
 # 🔸 Ejemplo:

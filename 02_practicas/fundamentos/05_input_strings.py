@@ -1,15 +1,28 @@
 # ============================
 # 📝 Ejercicios: Input y Strings
-# 📘 Teoría: fundamentos/05_input.py
+# 📘 Teoría: Clases_teoria/fundamentos/05_input.py
 # ============================
 
 # 🔸 Ejemplo:
-# input() siempre devuelve un string, hay que hacer casting si querés un número
-nombre = "Raúl"  # Simulamos input para que el archivo corra sin pedir datos
+# input() siempre devuelve un string; hay que hacer casting si querés un número.
+# Simulamos datos para que el archivo corra sin pedir input.
+nombre = "Raúl"
+ciudad = "Asunción"
 precio = 49.99
+
+print("Hola " + nombre + ", sos de " + ciudad + ".")  # concatenación
+print(f"Hola {nombre}, sos de {ciudad}.")             # f-string
 print(f"Hola {nombre}, el precio es: ${precio:.2f}")
 
+# Ejemplo de casting con input (descomentá para probar):
+# edad = input("Ingresá tu edad: ")
+# edad = int(edad)
+# print("Tu edad dentro de 5 años será:", edad + 5)
+
 # ============================
+# ENUNCIADOS
+# ============================
+
 # Ejercicio 1: Datos personales
 # Pedí nombre y edad al usuario. Imprimí con f-string:
 # "Me llamo X y tengo Y años"
@@ -38,6 +51,9 @@ print(f"Hola {nombre}, el precio es: ${precio:.2f}")
 
 
 # Ejercicio 6: Suma de dos números
-# Pedí dos números al usuario y mostrá la suma.
-# Recordá que input() devuelve string, tenés que hacer casting con int() o float()
+# Pedí dos números al usuario y mostrá la suma, resta, multiplicación y división.
+# Recordá que input() devuelve string: usá int() o float()
 
+
+# Ejercicio 7: Decimal como string
+# Pedí un número decimal como string y convertilo a float. Mostrá el resultado.

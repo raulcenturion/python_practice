@@ -1,6 +1,6 @@
 # ============================
 # 📝 Ejercicios: Diccionarios, Tuplas y Sets
-# 📘 Teoría: fundamentos/22_diccionarios.py + 23_tuplas.py + 14_sets.py
+# 📘 Teoría: Clases_teoria/fundamentos/22_diccionarios.py + 23_tuplas.py + 14_sets.py
 # ============================
 
 # 🔸 Ejemplo:

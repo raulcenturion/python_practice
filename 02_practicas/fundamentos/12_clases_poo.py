@@ -1,6 +1,6 @@
 # ============================
 # 📝 Ejercicios: Clases y POO
-# 📘 Teoría: fundamentos/15_clases.py + 19_herencia_polimorfismo.py
+# 📘 Teoría: Clases_teoria/fundamentos/15_clases.py + 19_herencia_polimorfismo.py
 # ============================
 
 # 🔸 Ejemplo:

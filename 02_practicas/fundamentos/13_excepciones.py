@@ -1,6 +1,6 @@
 # ============================
 # 📝 Ejercicios: Excepciones
-# 📘 Teoría: fundamentos/16_excepciones.py
+# 📘 Teoría: Clases_teoria/fundamentos/16_excepciones.py
 # ============================
 
 # 🔸 Ejemplo:

@@ -1,6 +1,6 @@
 # ============================
 # 📝 Ejercicios: Listas y sus métodos
-# 📘 Teoría: fundamentos/08_listas.py + 09_metodos_listas.py
+# 📘 Teoría: Clases_teoria/fundamentos/08_listas.py + 09_metodos_listas.py
 # ============================
 
 # 🔸 Ejemplo:
