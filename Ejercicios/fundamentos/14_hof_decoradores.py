@@ -50,3 +50,26 @@ def mi_decorador(func):
 # Creá un decorador @requiere_admin que solo ejecute la función si
 # el argumento usuario == "admin". Si no, imprimí "Acceso denegado".
 
+
+# ============================
+# ESTILO FASTAPI (@app.get / @app.post)
+# ============================
+
+# Ejercicio 7: Mini router
+# Creá una clase MiniApp con:
+# - self.routes = {}
+# - método get(path) que retorne un decorador y registre ("GET", path) -> func
+# - método handle(method, path, **kwargs) que ejecute el handler o retorne 404
+# Luego:
+#   app = MiniApp()
+#   @app.get("/ping")
+#   def ping():
+#       return {"status": "ok"}
+#   print(app.handle("GET", "/ping"))
+
+
+# Ejercicio 8: También POST
+# Agregá post(path) a MiniApp.
+# Registrá @app.post("/echo") que reciba mensaje: str y retorne {"echo": mensaje}.
+# Probá app.handle("POST", "/echo", mensaje="hola").
+

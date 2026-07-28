@@ -101,9 +101,66 @@ def proceso_lento():
 proceso_lento()
 
 # ============================
+# 🔹 Puente a FastAPI: @app.get / @app.post
+# ============================
+# En FastAPI, @app.get("/ruta") NO es magia: es un decorador que
+# registra la función como handler de esa ruta + método HTTP.
+
+
+class MiniApp:
+    """Router mínimo para entender @app.get / @app.post."""
+
+    def __init__(self):
+        self.routes = {}  # (method, path) -> función
+
+    def get(self, path: str):
+        def decorator(func):
+            self.routes[("GET", path)] = func
+            return func  # la función original se mantiene usable
+        return decorator
+
+    def post(self, path: str):
+        def decorator(func):
+            self.routes[("POST", path)] = func
+            return func
+        return decorator
+
+    def handle(self, method: str, path: str, **kwargs):
+        handler = self.routes.get((method, path))
+        if not handler:
+            return {"error": "404 Not Found"}
+        return handler(**kwargs)
+
+
+app = MiniApp()
+
+
+@app.get("/hola")
+def hola():
+    return {"msg": "hola"}
+
+
+@app.get("/users/{user_id}")
+def get_user(user_id: int):
+    return {"id": user_id, "nombre": f"user-{user_id}"}
+
+
+@app.post("/users")
+def create_user(nombre: str):
+    return {"id": 1, "nombre": nombre}
+
+
+print("Rutas registradas:", list(app.routes.keys()))
+print(app.handle("GET", "/hola"))
+print(app.handle("GET", "/users/{user_id}", user_id=7))
+print(app.handle("POST", "/users", nombre="Raúl"))
+print(app.handle("GET", "/no-existe"))
+
+# ============================
 # 🔹 Resumen
 # ============================
 # - Un decorador es una función que recibe una función y retorna una nueva función "mejorada"
 # - Se aplican con @nombre_decorador arriba de la función
 # - *args y **kwargs permiten que el wrapper acepte cualquier cantidad de argumentos
 # - Casos de uso comunes: autenticación, logging, caché, validación, medición de tiempo
+# - @app.get / @app.post en FastAPI = decoradores que registran rutas

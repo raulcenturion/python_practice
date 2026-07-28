@@ -1,6 +1,6 @@
 # welcomePy
 
-Repo de estudio de Python: teoría + prácticas alineadas.
+Repo de estudio de Python: teoría + prácticas alineadas (base previa a FastAPI).
 
 ## Estructura
 
@@ -26,6 +26,22 @@ Ejercicios/        → enunciados y prácticas (espejo de la teoría)
 2. Resolvé el archivo correspondiente en `Ejercicios/<tema>/...`
 3. Cada ejercicio apunta a su teoría en el encabezado (`📘 Teoría: ...`)
 
+## Checklist pre-FastAPI
+
+| Tema | Teoría | Práctica | Estado |
+|------|--------|----------|--------|
+| Variables y tipos | `fundamentos/02`–`04` | `02`, `04`, `04b` | Cubierto |
+| Listas / dict / tuplas / sets | `08`–`09`, `14`, `22`–`23` | `07`, `11` | Cubierto |
+| if / for / while | `06`, `10`–`12` | `06`, `08`, `09` | Cubierto |
+| Funciones y módulos | `13`, `17` | `10`, `15` | Cubierto |
+| try/except + excepciones custom | `16` | `13` | Cubierto |
+| Clases y herencia | `15`, `19` | `12` | Cubierto |
+| Modelos de datos (Pydantic) | `29_modelos_datos_pydantic` | `18_modelos_datos_pydantic` | Cubierto |
+| Archivos y JSON | `20`, `21` | `15` | Cubierto |
+| venv + pip + requirements | `27_entornos_virtuales` (+ `26`) | `16_entornos_virtuales` | Cubierto |
+| Decoradores (`@app.get` style) | `25_decoradores` | `14_hof_decoradores` | Cubierto |
+| async / await | `28_async_await` | `17_async_await` | Cubierto |
+
 ## Fundamentos (orden sugerido)
 
 | Ejercicio | Teoría |
@@ -46,3 +62,6 @@ Ejercicios/        → enunciados y prácticas (espejo de la teoría)
 | `13_excepciones.py` | `16_excepciones.py` |
 | `14_hof_decoradores.py` | `24` + `25` |
 | `15_modulos_ficheros_json.py` | `17` + `20` + `21` |
+| `16_entornos_virtuales.py` | `27_entornos_virtuales.py` |
+| `17_async_await.py` | `28_async_await.py` |
+| `18_modelos_datos_pydantic.py` | `29_modelos_datos_pydantic.py` |
