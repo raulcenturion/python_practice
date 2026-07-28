@@ -1,67 +1,80 @@
 # welcomePy
 
-Repo de estudio de Python: teoría + prácticas alineadas (base previa a FastAPI).
+Repo de estudio de Python: cada lección junta **teoría + práctica** (checklist hacia FastAPI).
+
+## Cómo estudiar
+
+Abrí una carpeta de lección (ej. `Lecciones/fundamentos/01_print_comentarios/`):
+
+1. Leé `teoria.py` (o `teoria_*.py` si hay más de una)
+2. Resolvé `practica.py` en la misma carpeta
+3. Pasá a la lección siguiente (`02_...`, `03_...`)
 
 ## Estructura
 
 ```text
-Clases_teoria/     → teoría por tema
-  fundamentos/
-  fechas/
-  logica/
-  regex/
-  scraping/
-
-Ejercicios/        → enunciados y prácticas (espejo de la teoría)
-  fundamentos/
+Lecciones/
+  fundamentos/     → base Python (orden 01 → 20)
   fechas/
   logica/
   regex/
   scraping/
 ```
 
-## Cómo estudiar
+Cada lección:
 
-1. Leé el tema en `Clases_teoria/<tema>/...`
-2. Resolvé el archivo correspondiente en `Ejercicios/<tema>/...`
-3. Cada ejercicio apunta a su teoría en el encabezado (`📘 Teoría: ...`)
+```text
+01_print_comentarios/
+  teoria.py
+  practica.py
+```
+
+Si el tema necesita más de un archivo de teoría:
+
+```text
+07_listas/
+  teoria_listas.py
+  teoria_metodos.py
+  practica.py
+```
+
+## Fundamentos (checklist)
+
+| # | Lección | Contenido |
+|---|---------|-----------|
+| 01 | `print_comentarios` | print, comentarios |
+| 02 | `tipos_de_datos` | str, int, float, bool, … |
+| 03 | `casting` | conversiones |
+| 04 | `variables` | variables + `practica_operaciones.py` |
+| 05 | `input` | input y strings |
+| 06 | `condicionales_booleanos` | if/else, bool |
+| 07 | `listas` | listas y métodos |
+| 08 | `while` | while |
+| 09 | `for_rangos` | for y range |
+| 10 | `funciones` | def, params, return |
+| 11 | `diccionarios_tuplas_sets` | dict, tuple, set |
+| 12 | `clases_poo` | clases y herencia |
+| 13 | `excepciones` | try/except/finally |
+| 14 | `hof_decoradores` | HOF y `@` (estilo FastAPI) |
+| 15 | `modulos_ficheros_json` | módulos, archivos, JSON |
+| 16 | `valor_referencia` | teoría |
+| 17 | `librerias` | pip / paquetes (teoría) |
+| 18 | `entornos_virtuales` | venv + requirements |
+| 19 | `async_await` | async / await |
+| 20 | `modelos_datos_pydantic` | dataclasses → Pydantic |
 
 ## Checklist pre-FastAPI
 
-| Tema | Teoría | Práctica | Estado |
-|------|--------|----------|--------|
-| Variables y tipos | `fundamentos/02`–`04` | `02`, `04`, `04b` | Cubierto |
-| Listas / dict / tuplas / sets | `08`–`09`, `14`, `22`–`23` | `07`, `11` | Cubierto |
-| if / for / while | `06`, `10`–`12` | `06`, `08`, `09` | Cubierto |
-| Funciones y módulos | `13`, `17` | `10`, `15` | Cubierto |
-| try/except + excepciones custom | `16` | `13` | Cubierto |
-| Clases y herencia | `15`, `19` | `12` | Cubierto |
-| Modelos de datos (Pydantic) | `29_modelos_datos_pydantic` | `18_modelos_datos_pydantic` | Cubierto |
-| Archivos y JSON | `20`, `21` | `15` | Cubierto |
-| venv + pip + requirements | `27_entornos_virtuales` (+ `26`) | `16_entornos_virtuales` | Cubierto |
-| Decoradores (`@app.get` style) | `25_decoradores` | `14_hof_decoradores` | Cubierto |
-| async / await | `28_async_await` | `17_async_await` | Cubierto |
-
-## Fundamentos (orden sugerido)
-
-| Ejercicio | Teoría |
-|----------|--------|
-| `01_print.py` | `01_print_comentarios.py` |
-| `02_tipos_de_datos.py` | `02_tipos_de_datos.py` |
-| `03_casting.py` | `03_casting.py` |
-| `04_variables.py` | `04_variables.py` |
-| `04b_operaciones_aritmeticas.py` | `04_variables.py` (operadores) |
-| `05_input_strings.py` | `05_input.py` |
-| `06_condicionales_booleanos.py` | `06` + `07` |
-| `07_listas.py` | `08` + `09` |
-| `08_while.py` | `10_while.py` |
-| `09_for_rangos.py` | `11` + `12` |
-| `10_funciones.py` | `13_funciones.py` |
-| `11_diccionarios_tuplas_sets.py` | `22` + `23` + `14` |
-| `12_clases_poo.py` | `15` + `19` |
-| `13_excepciones.py` | `16_excepciones.py` |
-| `14_hof_decoradores.py` | `24` + `25` |
-| `15_modulos_ficheros_json.py` | `17` + `20` + `21` |
-| `16_entornos_virtuales.py` | `27_entornos_virtuales.py` |
-| `17_async_await.py` | `28_async_await.py` |
-| `18_modelos_datos_pydantic.py` | `29_modelos_datos_pydantic.py` |
+| Tema | Lección |
+|------|---------|
+| Variables y tipos | 01–05 |
+| Listas / dict / tuplas / sets | 07, 11 |
+| if / for / while | 06, 08, 09 |
+| Funciones y módulos | 10, 15 |
+| Errores | 13 |
+| POO | 12 |
+| Archivos y JSON | 15 |
+| venv + pip | 18 (+ 17) |
+| Decoradores | 14 |
+| async / await | 19 |
+| Pydantic | 20 |
