@@ -7,6 +7,7 @@
 #   ./r teoria                   → teoria.py de la carpeta actual
 #   ./r 01                       → Lecciones/fundamentos/01_*/practica.py
 #   ./r 01 teoria                → Lecciones/fundamentos/01_*/teoria.py
+#   ./r 04 practica_operaciones  → Lecciones/fundamentos/04_*/practica_operaciones.py
 #   ./r integradores/01          → Lecciones/integradores/01_*/practica.py
 #   ./r ruta/al/archivo.py       → ese archivo
 
@@ -52,26 +53,39 @@ if [[ "$arg1" == "practica" || "$arg1" == "teoria" ]]; then
   run_file "${arg1}.py"
 fi
 
-# Número de lección fundamentos: ./r 01  o  ./r 01 teoria
+# Número de lección fundamentos:
+#   ./r 01
+#   ./r 01 teoria
+#   ./r 04 practica_operaciones
 if [[ "$arg1" =~ ^[0-9]{1,2}$ ]]; then
   num=$(printf "%02d" "$((10#$arg1))")
   kind="$arg2"
-  [[ "$kind" != "teoria" && "$kind" != "practica" ]] && kind="practica"
+  kind="${kind%.py}"  # permite ./r 04 practica_operaciones.py
   matches=(Lecciones/fundamentos/"${num}_"*/)
   if [[ ! -d "${matches[0]}" ]]; then
     echo "No hay lección fundamentos ${num}_*" >&2
     exit 1
   fi
+  lesson_dir="${matches[0]}"
+
   if [[ "$kind" == "teoria" ]]; then
-    # prefer teoria.py; si no, primer teoria_*.py
-    if [[ -f "${matches[0]}teoria.py" ]]; then
-      run_file "${matches[0]}teoria.py"
+    if [[ -f "${lesson_dir}teoria.py" ]]; then
+      run_file "${lesson_dir}teoria.py"
     fi
-    t=( "${matches[0]}"teoria_*.py )
+    t=( "${lesson_dir}"teoria_*.py )
     run_file "${t[0]}"
-  else
-    run_file "${matches[0]}practica.py"
   fi
+
+  # practica, practica_operaciones, u otro .py de la lección
+  target="${lesson_dir}${kind}.py"
+  if [[ -f "$target" ]]; then
+    run_file "$target"
+  fi
+
+  echo "No encontré ${kind}.py en ${lesson_dir}" >&2
+  echo "Archivos disponibles:" >&2
+  ls -1 "$lesson_dir"*.py >&2
+  exit 1
 fi
 
 # integradores: ./r integradores/01
@@ -83,5 +97,5 @@ if [[ "$arg1" == integradores/* ]]; then
 fi
 
 echo "No entendí: $*" >&2
-echo "Ejemplos: ./r 01  |  ./r 01 teoria  |  ./r integradores/01" >&2
+echo "Ejemplos: ./r 01  |  ./r 01 teoria  |  ./r 04 practica_operaciones  |  ./r integradores/01" >&2
 exit 1

@@ -73,8 +73,8 @@ print(var, type(var))  # Muestra: Hola <class 'str'>
 # Tipado fuerte: no se pueden realizar operaciones entre diferentes tipos de datos sin conversión explícita
 num = 5          # int
 texto = "10"     # str
-# suma = num + texto  # Esto generaría un error de tipo
-# print(suma)  # Esto generaría un error
+# suma = num + texto  -> Esto generaría un error de tipo
+# print(suma)  -> Esto generaría un error
 edad = 25
 nombre = "Carlos"
 print(f"Mi nombre es {nombre} y tengo {edad} años.")  # Usando f-string
