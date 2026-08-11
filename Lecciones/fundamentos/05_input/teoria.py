@@ -12,4 +12,4 @@ print("Altura:", altura, type(altura))  # Muestra la altura y su tipo (debe ser 
 print("Hola, como te llamas?")
 nombre = input()  # Lee el nombre ingresado por el usuario
 print("Hola " + nombre + ", es un gusto conocerte!")
-print(f"Hola {nombre}, es un gusto conocerte!")  # Usando f-string para formateo
+print(f"Hola {nombre}, es un gusto conocerte! -> f-string")  # Usando f-string para formateo
