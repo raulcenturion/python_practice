@@ -56,8 +56,7 @@ def mostrar_menu() -> None:
 
 
 def main() -> None:
-    # Cuando implementes cargar_contactos, usá:
-    # contactos = cargar_contactos()
+    """Menú CLI. Cuando tengas cargar_contactos, usala en lugar de []."""
     contactos: list[dict] = []
 
     while True:

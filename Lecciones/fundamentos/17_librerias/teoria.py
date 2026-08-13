@@ -4,6 +4,8 @@
 # Python tiene una enorme comunidad que crea paquetes/librerías de terceros.
 # Se instalan con pip (el gestor de paquetes de Python).
 
+print("--- Lección 17: Librerías externas ---")
+
 # ============================
 # 🔹 Instalar una librería
 # ============================
@@ -25,23 +27,25 @@
 # 🔹 Ejemplo con cowpy (librería divertida)
 # ============================
 # Primero instalar: pip install cowpy
+print("\n--- Ejemplo: cowpy ---")
 try:
     from cowpy import cow
     my_cow = cow.Cowacter()
-    print(my_cow.milk("I love Python"))
+    print("cowpy milk:", my_cow.milk("I love Python"))
 except ImportError:
-    print("⚠️ cowpy no está instalada. Ejecutá: pip install cowpy")
+    print("aviso:", "⚠️ cowpy no está instalada. Ejecutá: pip install cowpy")
 
 # ============================
 # 🔹 Ejemplo con requests (HTTP)
 # ============================
 # Primero instalar: pip install requests
+print("\n--- Ejemplo: requests ---")
 try:
     import requests
     response = requests.get("https://jsonplaceholder.typicode.com/todos/1")
-    print(response.json())
+    print("response.json():", response.json())
 except ImportError:
-    print("⚠️ requests no está instalada. Ejecutá: pip install requests")
+    print("aviso:", "⚠️ requests no está instalada. Ejecutá: pip install requests")
 
 # ============================
 # 🔹 Diferencia entre módulo y librería

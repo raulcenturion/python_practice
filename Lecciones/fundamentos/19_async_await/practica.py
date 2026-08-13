@@ -4,7 +4,7 @@
 # ============================
 
 import asyncio
-import time
+
 
 # 🔸 Ejemplo:
 async def saludar(nombre: str) -> str:

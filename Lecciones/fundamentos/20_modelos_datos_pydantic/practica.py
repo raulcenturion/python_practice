@@ -5,6 +5,7 @@
 
 from dataclasses import dataclass
 
+
 # 🔸 Ejemplo dataclass:
 @dataclass
 class ProductoDC:

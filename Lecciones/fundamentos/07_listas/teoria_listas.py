@@ -1,80 +1,109 @@
-# Listas en Python 
+# Listas en Python
 # Una lista es una colección ordenada y mutable de elementos, que pueden ser de diferentes tipos de datos.
 # Las listas se definen utilizando corchetes [] y los elementos se separan por comas.
+
 # Ejemplo de creación de una lista
+print("--- Crear una lista ---")
 mi_lista = [1, 2, 3, "cuatro", "cinco", 6.0]
-print(mi_lista)
+print("mi_lista:", mi_lista)
+
+print("\n--- Ejemplo: Celsius a Fahrenheit (input) ---")
 celsius = float(input("Ingrese la temperatura en grados Celsius: "))
 fahrenheit = (celsius * 9/5) + 32
 print(f"{celsius} grados Celsius son {fahrenheit} grados Fahrenheit.")
+
 # Tipos de datos en listas
 # Las listas pueden contener elementos de diferentes tipos de datos, como enteros, flotantes, cadenas, booleanos, etc.
+print("\n--- Lista mixta ---")
 mi_lista_mixta = [1, "dos", 3.0, True, [5, 6], (7, 8)]
-print(mi_lista_mixta)
+print("mi_lista_mixta:", mi_lista_mixta)
+
 # Acceso a elementos de una lista
 # Los elementos de una lista se acceden mediante índices, que comienzan en 0.
-print(mi_lista[0])  # Primer elemento
-print(mi_lista[3])  # Cuarto elemento
-print(mi_lista[-1]) # Último elemento
+print("\n--- Acceso por índice ---")
+print("mi_lista[0]:", mi_lista[0])   # Primer elemento
+print("mi_lista[3]:", mi_lista[3])   # Cuarto elemento
+print("mi_lista[-1]:", mi_lista[-1])  # Último elemento
+
 # Modificación de elementos de una lista
+print("\n--- Modificar elementos ---")
 mi_lista[1] = "dos_modificado"
-print(mi_lista)
+print("mi_lista:", mi_lista)
+
 # Agregar elementos a una lista
+print("\n--- Agregar elementos (append / insert) ---")
 mi_lista.append("nuevo_elemento")
-print(mi_lista)
+print("después de append:", mi_lista)
 mi_lista.insert(2, "elemento_en_posicion_2")
-print(mi_lista)
+print("después de insert:", mi_lista)
+
 # Eliminar elementos de una lista
+print("\n--- Eliminar elementos (remove / del) ---")
 mi_lista.remove("cuatro")
-print(mi_lista)
+print("después de remove:", mi_lista)
 del mi_lista[0]
-print(mi_lista)
+print("después de del:", mi_lista)
+
 # Recorrer una lista
+print("\n--- Recorrer una lista ---")
 for elemento in mi_lista:
-    print(elemento)
+    print("elemento:", elemento)
+
 # Funciones útiles para listas
-print(len(mi_lista))          # Longitud de la lista
-print(mi_lista.count(2))      # Cuenta cuántas veces aparece el elemento 2
-print(mi_lista.index("cinco")) # Índice del elemento "cinco"
-lista1: list[int|str|float|bool] = [1, "hola", 3.14, True] # Lista de tipos mixtos
+print("\n--- Funciones útiles (len / count / index) ---")
+print("len(mi_lista):", len(mi_lista))            # Longitud de la lista
+print("mi_lista.count(2):", mi_lista.count(2))    # Cuenta cuántas veces aparece el elemento 2
+print('mi_lista.index("cinco"):', mi_lista.index("cinco"))  # Índice del elemento "cinco"
+lista1: list[int|str|float|bool] = [1, "hola", 3.14, True]  # Lista de tipos mixtos
 lista_vacia = []  # Lista vacía
+print("lista1:", lista1)
+print("lista_vacia:", lista_vacia)
+
 # Listas anidadas
+print("\n--- Listas anidadas y matrices ---")
 lista_anidada = [1, 2, [3, 4], [5, 6]]
+print("lista_anidada:", lista_anidada)
 # Matrices (listas de listas)
 matriz = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-print(matriz[1][2])  # Acceder al elemento 6
+print("matriz[1][2]:", matriz[1][2])  # Acceder al elemento 6
 
 # Concatenar listas
+print("\n--- Concatenar listas ---")
 lista1 = [1, 2, 3]
 lista2 = [4, 5, 6]
 lista_concatenada = lista1 + lista2
-print(lista_concatenada)
+print("lista_concatenada:", lista_concatenada)
+
 # slices (rebanadas) de listas
+print("\n--- Slicing (rebanadas) ---")
 sub_lista = lista_concatenada[1:4]  # Elementos desde el índice 1 hasta el 3
-print(sub_lista)
-lista = [1,2,3,4,5]
-print(lista[::2])  # Elementos en posiciones pares
-print(lista[::-1]) # Lista invertida
-print(lista[:3])  # Primeros tres elementos
-print(lista[3:])  # Desde el cuarto elemento hasta el final
-print(lista[:])  # Toda la lista
-print(lista[1:-1])  # Desde el segundo elemento hasta el penúltimo
-print(lista[1:4])  # Desde el segundo elemento hasta el cuarto (sin incluirlo)
+print("sub_lista [1:4]:", sub_lista)
+lista = [1, 2, 3, 4, 5]
+print("lista[::2]:", lista[::2])    # Elementos en posiciones pares
+print("lista[::-1]:", lista[::-1])  # Lista invertida
+print("lista[:3]:", lista[:3])      # Primeros tres elementos
+print("lista[3:]:", lista[3:])      # Desde el cuarto elemento hasta el final
+print("lista[:]:", lista[:])        # Toda la lista
+print("lista[1:-1]:", lista[1:-1])  # Desde el segundo elemento hasta el penúltimo
+print("lista[1:4]:", lista[1:4])    # Desde el segundo elemento hasta el cuarto (sin incluirlo)
 # Desde, hasta, paso
-print(lista[::2])  # Desde el inicio hasta el final, con paso 2
-print(lista[1::2]) # Desde el segundo elemento hasta el final, con paso 2
-print(lista[:4:2]) # Desde el inicio hasta el cuarto elemento (sin incluirlo), con paso 2
-print(lista[::-1]) # Lista invertida
+print("lista[::2]:", lista[::2])    # Desde el inicio hasta el final, con paso 2
+print("lista[1::2]:", lista[1::2])  # Desde el segundo elemento hasta el final, con paso 2
+print("lista[:4:2]:", lista[:4:2])  # Desde el inicio hasta el cuarto elemento (sin incluirlo), con paso 2
+print("lista[::-1]:", lista[::-1])  # Lista invertida
+
 # Añadir elementos a una lista
+print("\n--- Añadir con + / append / += ---")
 lista3 = [1, 2, 3]
 # Forma larga y menos eficiente
 lista3 = lista3 + [4]
-print(lista3)
+print("lista3 + [4]:", lista3)
 # Forma eficiente
 lista3.append(5)
-print(lista3)
-lista3 += [6,7,8,9]
-print(lista3)
+print("después de append(5):", lista3)
+lista3 += [6, 7, 8, 9]
+print("después de += [6,7,8,9]:", lista3)
+
 # Ejercicios prácticos con listas y condicionales
 ###
 # EJERCICIOS

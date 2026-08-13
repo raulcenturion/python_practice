@@ -4,6 +4,8 @@
 # Antes de FastAPI (o cualquier proyecto), aislás las dependencias
 # en un entorno virtual para no mezclar paquetes del sistema.
 
+print("--- Lección 18: Entornos virtuales ---")
+
 # ============================
 # 🔹 ¿Para qué sirve un venv?
 # ============================
@@ -53,13 +55,15 @@ def esta_en_venv() -> bool:
     return sys.prefix != getattr(sys, "base_prefix", sys.prefix)
 
 
-print(f"¿Corriendo dentro de un venv?: {esta_en_venv()}")
-print(f"Python ejecutable: {sys.executable}")
-print(f"Prefijo: {sys.prefix}")
+print("\n--- Verificar si estás en un venv ---")
+print("¿Corriendo dentro de un venv?:", esta_en_venv())
+print("Python ejecutable:", sys.executable)
+print("Prefijo:", sys.prefix)
 
 # ============================
 # 🔹 Leer requirements.txt del proyecto
 # ============================
+print("\n--- Leer requirements.txt del proyecto ---")
 req = Path(__file__).resolve().parents[3] / "requirements.txt"
 if req.exists():
     lineas = [
@@ -67,13 +71,13 @@ if req.exists():
         for linea in req.read_text(encoding="utf-8").splitlines()
         if linea.strip() and not linea.strip().startswith("#")
     ]
-    print(f"\nDependencias en requirements.txt ({len(lineas)}):")
+    print("Dependencias en requirements.txt:", len(lineas))
     for linea in lineas[:5]:
-        print(f"  - {linea}")
+        print("  -", linea)
     if len(lineas) > 5:
         print("  ...")
 else:
-    print("\nNo se encontró requirements.txt en la raíz del repo.")
+    print("aviso:", "No se encontró requirements.txt en la raíz del repo.")
 
 # ============================
 # 🔹 Resumen (checklist pre-FastAPI)

@@ -1,51 +1,46 @@
 ###
 # Listas metodos
-# Los métodos más importantes para listas son:
-# append(): Agrega un elemento al final de la lista.
-# extend(): Extiende la lista agregando todos los elementos de otra lista.
-# insert(): Inserta un elemento en una posición específica.
-# remove(): Elimina la primera aparición de un elemento específico.
-# pop(): Elimina y devuelve el elemento en una posición específica (por defecto, el último).
-# clear(): Elimina todos los elementos de la lista.
-# index(): Devuelve el índice de la primera aparición de un elemento específico.
-# count(): Cuenta cuántas veces aparece un elemento específico en la lista.
-# sort(): Ordena los elementos de la lista en orden ascendente (o según una función personalizada).
-# sorted(): Devuelve una nueva lista ordenada sin modificar la original.
-# reverse(): Invierte el orden de los elementos en la lista.
-# copy(): Devuelve una copia superficial de la lista.
-lista = [1,2,3,4,5, 6]
-lista.insert(2, "nuevo") # Inserta "nuevo" en la posición 2
-print(lista)
+# append, extend, insert, remove, pop, clear, index, count,
+# sort, sorted, reverse, copy
+###
 
-# Eliminar un rango de elementos
-lista1 = ['🐼', '🐨', '🐶', '😿', '🐹']
-del lista1[1:3] # eliminamos los elementos del índice 1 al 3 (no incluye el índice 3)
-print(lista1)
+DOG = "🐶"
+PANDA = "🐼"
+KOALA = "🐨"
+NUMBERS = [3, 10, 2, 8, 99, 101]
+FRUTAS_BASE = ["manzana", "pera", "manzana", "pera", "limón"]
 
-# Más métodos útiles
-print('Ordenar listas modificando la original')
-numbers = [3, 10, 2, 8, 99, 101]
+print("--- insert() ---")
+lista = [1, 2, 3, 4, 5, 6]
+lista.insert(2, "nuevo")
+print("lista:", lista)
+
+print("\n--- del con rango ---")
+lista1 = [PANDA, KOALA, DOG, "😿", "🐹"]
+del lista1[1:3]
+print("lista1:", lista1)
+
+print("\n--- sort() (modifica la original) ---")
+numbers = list(NUMBERS)
 numbers.sort()
-print(numbers)
+print("numbers:", numbers)
 
-print('Ordenar listas creando una nueva lista')
-numbers = [3, 10, 2, 8, 99, 101]
-sorted_numbers = sorted(numbers)
-print(sorted_numbers)
+print("\n--- sorted() (nueva lista) ---")
+sorted_numbers = sorted(NUMBERS)
+print("sorted_numbers:", sorted_numbers)
 
-print("Ordenar una lista de cadenas de texto (todo minúscula)")
-frutas = ['manzana', 'pera', 'limón', 'manzana', 'pera', 'limón']
-sorted_frutas = sorted(frutas)
-print(sorted_frutas)
+print("\n--- sorted() con cadenas (minúsculas) ---")
+sorted_frutas = sorted(FRUTAS_BASE)
+print("sorted_frutas:", sorted_frutas)
 
-print("Ordenar una lista de cadenas de texto (mezclas mayúscula y minúscula)")
-frutas = ['manzana', 'Pera', 'Limón', 'manzana', 'pera', 'limón']
+print("\n--- sort(key=str.lower) ---")
+frutas = ["manzana", "Pera", "Limón", "manzana", "pera", "limón"]
 frutas.sort(key=str.lower)
-print(frutas)
+print("frutas:", frutas)
 
-# Más cositas útiles
-animals = ['🐶', '🐼', '🐨', '🐶']
-print(len(animals)) # Tamaño de la listas -> 4
-print(animals.count('🐶')) # Cuantas veces aparece el elemento '🐶' -> 2
-print('🐼' in animals) # Comprueba si hay un '🐼' en la lista -> True
-print('🐹' in animals) # -> False
+print("\n--- len / count / in ---")
+animals = [DOG, PANDA, KOALA, DOG]
+print("len(animals):", len(animals))
+print("count DOG:", animals.count(DOG))
+print("PANDA in animals:", PANDA in animals)
+print("hamster in animals:", "🐹" in animals)

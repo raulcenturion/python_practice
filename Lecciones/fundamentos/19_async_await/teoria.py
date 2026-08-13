@@ -7,6 +7,8 @@
 import asyncio
 import time
 
+print("--- Lección 19: async / await ---")
+
 # ============================
 # 🔹 Conceptos
 # ============================
@@ -36,7 +38,7 @@ async def tarea_async(nombre: str, segundos: float) -> str:
 # ============================
 async def ejemplo_simple():
     resultado = await tarea_async("A", 0.2)
-    print(resultado)
+    print("resultado:", resultado)
 
 
 # ============================
@@ -51,8 +53,8 @@ async def ejemplo_concurrente():
         tarea_async("download-3", 0.3),
     )
     duracion = time.perf_counter() - inicio
-    print(resultados)
-    print(f"Tiempo total concurrente: {duracion:.2f}s")
+    print("resultados:", resultados)
+    print("Tiempo total concurrente:", f"{duracion:.2f}s")
 
 
 # ============================
@@ -76,9 +78,9 @@ async def ejemplo_concurrente():
 
 
 async def main():
-    print("--- simple ---")
+    print("\n--- Ejemplo simple (await) ---")
     await ejemplo_simple()
-    print("--- concurrente ---")
+    print("\n--- Ejemplo concurrente (gather) ---")
     await ejemplo_concurrente()
 
 

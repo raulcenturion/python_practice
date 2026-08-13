@@ -4,12 +4,14 @@
 # En FastAPI, los "modelos" validan y documentan el shape de request/response.
 # Acá vemos la evolución: dict → dataclass → Pydantic BaseModel.
 
-from dataclasses import dataclass, asdict
-from typing import Optional
+from dataclasses import asdict, dataclass
+
+print("--- Lección 20: Modelos de datos (Pydantic) ---")
 
 # ============================
 # 🔹 1) Dict: flexible, pero sin validación
 # ============================
+print("\n--- Dict (sin validación) ---")
 usuario_dict = {"nombre": "Raúl", "edad": 35, "activo": True}
 print("dict:", usuario_dict)
 # Problema: nadie te impide usuario_dict["edad"] = "treinta"
@@ -17,6 +19,7 @@ print("dict:", usuario_dict)
 # ============================
 # 🔹 2) dataclass: estructura clara (stdlib)
 # ============================
+print("\n--- dataclass (estructura clara) ---")
 
 
 @dataclass
@@ -24,7 +27,7 @@ class UsuarioDC:
     nombre: str
     edad: int
     activo: bool = True
-    email: Optional[str] = None
+    email: str | None = None
 
 
 u1 = UsuarioDC(nombre="Raúl", edad=35, email="raul@mail.com")
@@ -35,13 +38,15 @@ print("como dict:", asdict(u1))
 # ============================
 # 🔹 3) Pydantic: validación en runtime (como en FastAPI)
 # ============================
+print("\n--- Pydantic BaseModel ---")
 try:
     from pydantic import BaseModel, EmailStr, Field, ValidationError
 except ImportError:
     print(
-        "\n⚠️ pydantic no está instalado.\n"
-        "   Activá el venv e instalá: pip install 'pydantic[email]'\n"
-        "   Luego: pip freeze > requirements.txt"
+        "aviso:",
+        "⚠️ pydantic no está instalado. "
+        "Activá el venv e instalá: pip install 'pydantic[email]'. "
+        "Luego: pip freeze > requirements.txt",
     )
     raise SystemExit(0)
 
@@ -55,11 +60,12 @@ class Usuario(BaseModel):
 
 # Creación válida
 usuario = Usuario(nombre="Raúl", edad=35, email="raul@mail.com")
-print("\npydantic model:", usuario)
+print("pydantic model:", usuario)
 print("model_dump():", usuario.model_dump())          # → dict (JSON-serializable)
 print("model_dump_json():", usuario.model_dump_json())  # → string JSON
 
 # Coerción / validación
+print("\n--- Coerción / validación desde JSON-like ---")
 # edad llega como string desde un JSON de API → Pydantic la convierte a int
 desde_api = Usuario.model_validate(
     {"nombre": "Ana", "edad": "28", "email": "ana@mail.com"}
@@ -67,11 +73,11 @@ desde_api = Usuario.model_validate(
 print("desde JSON-like:", desde_api)
 
 # Error de validación
+print("\n--- ValidationError (esperado) ---")
 try:
     Usuario(nombre="", edad=-1, email="no-es-email")
 except ValidationError as e:
-    print("\nValidationError (esperado):")
-    print(e.errors()[0]["type"], "→", e.errors()[0]["loc"])
+    print("error type:", e.errors()[0]["type"], "→", e.errors()[0]["loc"])
 
 # ============================
 # 🔹 Analogía FastAPI

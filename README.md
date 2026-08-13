@@ -19,7 +19,7 @@ Lecciones/
   logica/
   regex/
   scraping/
-  integradores/    → 3 proyectos de cierre (fácil → difícil)
+  integradores/    → repaso + proyectos de cierre
 ```
 
 Cada lección:
@@ -80,12 +80,11 @@ Si el tema necesita más de un archivo de teoría:
 | async / await | 19 |
 | Pydantic | 20 |
 
-## Integradores (cierre antes de FastAPI)
-
-Cuando termines fundamentos (y idealmente fechas/regex si te interesan), cerrá con:
+## Integradores
 
 | # | Proyecto | Nivel | Qué integra |
 |---|----------|-------|-------------|
+| 00 | `integradores/00_repaso_presupuesto_cli` | Repaso | lecciones 01→10 + 13 (CLI con input) |
 | 01 | `integradores/01_agenda_contactos` | Fácil | menú, dict/list, JSON, funciones, try/except |
 | 02 | `integradores/02_gestor_tareas` | Medio | POO, módulos, excepción propia, decorador |
 | 03 | `integradores/03_mini_api_biblioteca` | Difícil | rutas con `@`, Pydantic, async (+ `tips.md`) |

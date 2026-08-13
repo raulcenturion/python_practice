@@ -1,6 +1,21 @@
 # Integradores — cierre del repo (antes de FastAPI)
 
-Hacé los tres **en orden**. Cada uno suma temas; el último simula el estilo FastAPI.
+## Repaso intermedio (después de la lección 10 / 13)
+
+| # | Proyecto | Nivel | Carpeta |
+|---|----------|-------|---------|
+| 00 | Mini presupuesto CLI | Repaso 01→10 + 13 | `00_repaso_presupuesto_cli/` |
+
+Hacelo **antes** de los integradores “grandes” si querés asentar la base.
+El `enunciado.md` trae un **checklist por lección** (print/sep/end, tipos, casting, ops, input, if/bool, listas, while/continue, for/enumerate/range, funciones, try/except). Todo el flujo es por terminal.
+
+```bash
+./r integradores/00
+```
+
+## Integradores de cierre
+
+Hacé estos **en orden**. Cada uno suma temas; el último simula el estilo FastAPI.
 
 | # | Proyecto | Nivel | Carpeta |
 |---|----------|-------|---------|
@@ -16,6 +31,7 @@ Hacé los tres **en orden**. Cada uno suma temas; el último simula el estilo Fa
 
 ## Mapa rápido de temas
 
+- **00** → print, tipos, casting, variables, input, if, listas, while, for, funciones, try/except  
 - **01** → funciones, menú, dict/list, JSON, excepciones básicas  
 - **02** → POO, módulos, excepción propia, decorador, JSON  
 - **03** → decoradores tipo ruta, Pydantic, async/await (puente a FastAPI)

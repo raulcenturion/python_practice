@@ -9,6 +9,7 @@
 # ============================
 # 🔹 Sin decorador (forma manual)
 # ============================
+print("--- Sin decorador (forma manual) ---")
 def require_auth(func):
     """Decorador que verifica si el usuario es admin."""
     def wrapper(user):
@@ -23,22 +24,24 @@ def admin_dashboard(user):
 
 # Aplicar el decorador manualmente:
 protected_dashboard = require_auth(admin_dashboard)
-print(protected_dashboard("Admin"))      # Bienvenido al panel, Admin
-print(protected_dashboard("Invitado"))   # Acceso denegado
+print('protected_dashboard("Admin"):', protected_dashboard("Admin"))      # Bienvenido al panel, Admin
+print('protected_dashboard("Invitado"):', protected_dashboard("Invitado"))   # Acceso denegado
 
 # ============================
 # 🔹 Con decorador (forma elegante con @)
 # ============================
+print("\n--- Con decorador (@) ---")
 @require_auth  # Esto es lo mismo que: admin_panel = require_auth(admin_panel)
 def admin_panel(user):
     return f"Panel de administración para {user}"
 
-print(admin_panel("ADMIN"))      # Bienvenido...
-print(admin_panel("usuario"))    # Acceso denegado
+print('admin_panel("ADMIN"):', admin_panel("ADMIN"))      # Bienvenido...
+print('admin_panel("usuario"):', admin_panel("usuario"))    # Acceso denegado
 
 # ============================
 # 🔹 Decorador con logging (ejemplo práctico)
 # ============================
+print("\n--- Decorador con logging ---")
 def log_call(func):
     """Decorador que registra cada vez que se llama una función."""
     def wrapper(*args, **kwargs):
@@ -62,6 +65,7 @@ saludar("Raúl")
 # ============================
 # 🔹 Decorador con parámetros
 # ============================
+print("\n--- Decorador con parámetros (repetir) ---")
 def repetir(veces):
     """Decorador que ejecuta la función N veces."""
     def decorator(func):
@@ -81,7 +85,9 @@ decir_hola()  # Imprime "¡Hola!" 3 veces
 # ============================
 # 🔹 Decorador para medir tiempo de ejecución
 # ============================
+print("\n--- Decorador medir_tiempo ---")
 import time
+
 
 def medir_tiempo(func):
     """Decorador que mide cuánto tarda una función en ejecutarse."""
@@ -106,6 +112,7 @@ proceso_lento()
 # En FastAPI, @app.get("/ruta") NO es magia: es un decorador que
 # registra la función como handler de esa ruta + método HTTP.
 
+print("\n--- MiniApp (@app.get / @app.post) ---")
 
 class MiniApp:
     """Router mínimo para entender @app.get / @app.post."""
@@ -151,10 +158,10 @@ def create_user(nombre: str):
 
 
 print("Rutas registradas:", list(app.routes.keys()))
-print(app.handle("GET", "/hola"))
-print(app.handle("GET", "/users/{user_id}", user_id=7))
-print(app.handle("POST", "/users", nombre="Raúl"))
-print(app.handle("GET", "/no-existe"))
+print('handle GET /hola:', app.handle("GET", "/hola"))
+print('handle GET /users/{user_id}:', app.handle("GET", "/users/{user_id}", user_id=7))
+print('handle POST /users:', app.handle("POST", "/users", nombre="Raúl"))
+print('handle GET /no-existe:', app.handle("GET", "/no-existe"))
 
 # ============================
 # 🔹 Resumen

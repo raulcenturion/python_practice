@@ -11,7 +11,7 @@ print(persona.get("phone", "—"))  # — (valor por defecto si no existe)
 coordenadas = (10, 20)
 x, y = coordenadas  # Desempaquetado
 
-numeros = {1, 2, 2, 3, 3}
+numeros = {1, 2, 3}
 print(numeros)  # {1, 2, 3} → sin duplicados
 
 # ============================

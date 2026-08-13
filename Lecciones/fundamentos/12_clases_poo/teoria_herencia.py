@@ -3,7 +3,8 @@
 # La nueva clase (clase derivada) hereda atributos y métodos de la clase existente (clase base).
 # El polimorfismo permite que diferentes clases puedan ser tratadas como instancias de una clase común.
 # La función `isinstance()` se utiliza para verificar si una instancia pertenece a una clase específica o a una clase derivada.
-# Ejemplo de herencia
+
+print("--- Herencia (Animal / Perro / Gato) ---")
 class Animal:
     def __init__(self, nombre):
         self.nombre = nombre
@@ -18,7 +19,7 @@ class Perro(Animal):
 class Gato(Animal):
     def hablar(self):
         return "Miau"
-# Crear instancias de las clases derivadas
+
 perro = Perro("Fido")
 gato = Gato("Whiskers")
 print(f"{perro.nombre} dice: {perro.hablar()}")
@@ -28,16 +29,19 @@ print(f"{gato.nombre} dice: {gato.hablar()}")
 #punto1 = Punto(3, 4)
 #print(punto1)          # Llama a __str__
 #print(repr(punto1))    # Llama a __repr__
-# Ejemplo de polimorfismo
+
+print("\n--- Polimorfismo (hacer_hablar) ---")
 def hacer_hablar(animal):
     print(f"{animal.nombre} dice: {animal.hablar()}")
 hacer_hablar(perro)  # Funciona con instancia de Perro
 hacer_hablar(gato)   # Funciona con instancia de Gato
-# Verificación de tipos con isinstance
-print(isinstance(perro, Animal))  # True
-print(isinstance(gato, Animal))    # True
-print(isinstance(perro, Perro))    # True
-print(isinstance(gato, Perro))      # False
+
+print("\n--- isinstance() ---")
+print("isinstance(perro, Animal):", isinstance(perro, Animal))  # True
+print("isinstance(gato, Animal):", isinstance(gato, Animal))    # True
+print("isinstance(perro, Perro):", isinstance(perro, Perro))    # True
+print("isinstance(gato, Perro):", isinstance(gato, Perro))      # False
+
 # ============================
 # 🔹 Resumen
 # ============================

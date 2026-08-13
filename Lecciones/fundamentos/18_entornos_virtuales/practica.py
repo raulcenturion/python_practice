@@ -4,7 +4,6 @@
 # ============================
 
 import sys
-from pathlib import Path
 
 # 🔸 Ejemplo:
 print("Python:", sys.executable)

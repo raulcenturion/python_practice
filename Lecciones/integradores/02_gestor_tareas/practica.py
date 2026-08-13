@@ -24,17 +24,17 @@ def mostrar_menu() -> None:
 
 
 def main() -> None:
-    # 1) from models import GestorTareas, TareaInvalidaError
-    # 2) from storage import cargar_tareas, guardar_tareas
-    # 3) gestor = GestorTareas(cargar_tareas())
+    """
+    Armá el menú con GestorTareas + cargar/guardar_tareas.
+    Al mutar datos: guardar_tareas(gestor.to_list()).
+    Capturá TareaInvalidaError y mostrá el mensaje.
+    """
     while True:
         mostrar_menu()
         opcion = input("Opción: ").strip()
         if opcion == "7":
             print("Chau!")
             break
-        # Implementá 1-6. Al mutar: guardar_tareas(gestor.to_list())
-        # Capturá TareaInvalidaError y mostrá el mensaje.
         print(
             "Todavía no implementado. "
             "Leé enunciado.md y creá models.py / storage.py."

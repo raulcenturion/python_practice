@@ -40,30 +40,35 @@
 # ⚠️ Ejecutá desde esta carpeta de lección:
 # python teoria_modulos.py
 
+print("--- Importar módulo y paquete local ---")
 import math_utils
 from my_package import messages
 
 result = math_utils.addition(3, 4)
-print(f"Suma: {result}")  # 7
+print("Suma:", result)  # 7
 
-print(messages.greet("Raúl"))  # Hola, Raúl
-print(messages.bye("Raúl"))    # Adiós, Raúl
+print("greet:", messages.greet("Raúl"))  # Hola, Raúl
+print("bye:", messages.bye("Raúl"))    # Adiós, Raúl
 
 # ============================
 # 🔹 Módulos de la biblioteca estándar
 # ============================
 # Python viene con módulos muy útiles ya incluidos:
 
+print("\n--- Biblioteca estándar (math / datetime / os) ---")
 import math
-print(f"Pi: {math.pi}")                # 3.14159...
-print(f"Raíz de 16: {math.sqrt(16)}")  # 4.0
+
+print("Pi:", math.pi)                # 3.14159...
+print("Raíz de 16:", math.sqrt(16))  # 4.0
 
 import datetime
-hoy = datetime.date.today()
-print(f"Hoy es: {hoy}")
+
+hoy = datetime.datetime.now(datetime.UTC).date()
+print("Hoy es:", hoy)
 
 import os
-print(f"Directorio actual: {os.getcwd()}")
+
+print("Directorio actual:", os.getcwd())
 
 # Otros módulos útiles de la stdlib:
 # sys      → argumentos de línea de comandos, info del sistema
