@@ -17,7 +17,7 @@ print(frutas[1:3])             # ['kiwi', 'banana'] → slicing
 # Usando slicing, extraé solo la palabra "secreto".
 print("--- Ejercicio 1: Mensaje secreto ---")
 mensaje = ["C", "o", "d", "i", "g", "o", " ", "s", "e", "c", "r", "e", "t", "o"]
-palabra_secreto = mensaje[11:17]
+palabra_secreto = mensaje[7:]
 print("palabra_secreto:", palabra_secreto)
 
 
@@ -131,3 +131,26 @@ print("original:", original)
 print("copia_1:", copia_1)
 print("copia_2:", copia_2)
 print("referencia:", referencia)
+
+# --- Copia vs Referencia en listas ---
+# copia_1 = original[:] → usa slicing para copiar toda la lista.
+# copia_2 = original.copy() → usa el método copy() de la lista.
+#   Ambas crean una COPIA SUPERFICIAL independiente.
+#   En listas simples (números, strings) no hay diferencia.
+#   En listas anidadas u objetos, ambas copian solo referencias internas.
+#   Para una copia profunda se usa: import copy; copy.deepcopy(original)
+
+# referencia = original → NO crea copia, solo otro nombre para el mismo objeto.
+#   Cualquier cambio en referencia también afecta a original.
+#
+# Ejemplo:
+# original   = [1, 2, 3]
+# copia_1    = original[:]      → [1, 2, 3] (independiente)
+# copia_2    = original.copy()  → [1, 2, 3] (independiente)
+# referencia = original
+# referencia[0] = 10
+# Resultado:
+#   original   → [10, 2, 3]  (cambió porque referencia lo modificó)
+#   copia_1    → [1, 2, 3]   (no cambió)
+#   copia_2    → [1, 2, 3]   (no cambió)
+#   referencia → [10, 2, 3]  (igual que original)

@@ -1,0 +1,8 @@
+# Ruff — repo de aprendizaje
+# En las prácticas a veces pedimos NO usar builtins (max, min…)
+# para forzar el for/while; esa regla de estilo productivo molesta.
+
+[lint.per-file-ignores]
+# Prácticas / integradores: permitir if en vez de max()/min()
+"Lecciones/**/practica*.py" = ["PLR1730"]
+"Lecciones/integradores/**/practica.py" = ["PLR1730"]
