@@ -94,6 +94,21 @@ try:
 except (ValueError, IndexError) as e:
     print(f"No se pudo acceder ({type(e).__name__}):", e)
 
+# --- except con tupla ---
+# except (ValueError, IndexError) as e:
+#   → captura cualquiera de esos dos errores en la misma línea.
+#   → e es el objeto de la excepción.
+#
+# print(f"No se pudo acceder ({type(e).__name__}):", e)
+#   → f-string para mostrar información del error.
+#   → type(e).__name__ → nombre de la excepción (ej: IndexError).
+#   → e → mensaje del error (ej: "list index out of range").
+#
+# En resumen:
+# - Se agrupan excepciones si el manejo es el mismo.
+# - Se imprime tanto el tipo de error como su mensaje.
+
+
 # ---------------------------
 # try/except anidados
 # ---------------------------

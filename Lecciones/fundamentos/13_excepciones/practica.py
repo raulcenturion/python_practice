@@ -22,16 +22,16 @@ def dividir(a, b):
         return a / b
     except ZeroDivisionError:
         print("¡No se puede dividir por cero!")
-    except ValueError:
-        print("¡No se puede dividir por cero!")
     finally:
         print("Esto se ejecuta siempre!!.")
 # pedir valores al usuario
-a = float(input("Ingrese el numerador: "))
-b = float(input("Ingrese el denominador: "))
-
-resultado = dividir(a, b)
-print("Resultado:", resultado)
+try:
+    a = float(input("Ingrese el numerador: "))
+    b = float(input("Ingrese el denominador: "))
+    resultado = dividir(a, b)
+    print("Resultado:", resultado)
+except ValueError:
+    print("Ingresá un número válido.")
 # --- Ejercicio 1: Calculadora segura ---
 # def dividir(a, b):
 #   → intenta dividir a / b.
