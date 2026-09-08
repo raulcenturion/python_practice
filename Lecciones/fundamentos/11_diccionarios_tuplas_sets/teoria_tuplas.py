@@ -52,6 +52,36 @@ print(f"Mínimo: {resultado[0]}, Máximo: {resultado[1]}")
 # O con desempaquetado directo:
 minimo, maximo = min_max([5, 2, 8, 1, 9])
 print(f"Min: {minimo}, Max: {maximo}")
+# --- Tuplas como retorno ---
+# def min_max(lista):
+#   → devuelve una tupla con (min(lista), max(lista)).
+#   → min() y max() son funciones internas de Python:
+#       min() → recorre la lista y devuelve el menor valor.
+#       max() → recorre la lista y devuelve el mayor valor.
+#
+# resultado = min_max([5,2,8,1,9]) → (1, 9)
+# resultado[0] → 1 (mínimo)
+# resultado[1] → 9 (máximo)
+#
+# También se puede desempaquetar:
+# minimo, maximo = min_max([5,2,8,1,9])
+# → minimo = 1, maximo = 9
+# --- Desempaquetado de tuplas ---
+# min_max([5,2,8,1,9]) devuelve (1, 9).
+# minimo, maximo = min_max(...) → asigna:
+#   minimo = 1 (primer valor de la tupla)
+#   maximo = 9 (segundo valor de la tupla)
+#
+# IMPORTANTE:
+# - Python no "sabe" que son mínimo y máximo por el nombre.
+# - Solo asigna valores por posición:
+#   primera variable ← primer valor
+#   segunda variable ← segundo valor
+#
+# Ejemplo:
+# abc, dce = min_max([5,2,8,1,9])
+# abc = 1, dce = 9
+
 
 # 🔹 Tuplas como claves de diccionario (porque son inmutables)
 print("\n--- Tuplas como claves de diccionario ---")
