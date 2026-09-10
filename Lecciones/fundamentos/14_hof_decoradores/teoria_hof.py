@@ -171,6 +171,103 @@ print("sumar(3, 4):", sumar(3, 4))  # 7
 # Se usan mucho como argumento corto de map/filter/sorted.
 # ⚠️ Si la lógica es compleja, preferí def (más legible).
 
+# Nivel Fácil – Funciones como argumentos:
+# Un HOF es una función que recibe otra función como parámetro o devuelve una función.
+def aplicar(funcion, valor):
+    return funcion(valor)
+
+print(aplicar(len, "Raúl"))   # → 4
+print(aplicar(str.upper, "hola"))  # → "HOLA"
+# 👉 Concepto: aplicar recibe otra función (len, upper) y la ejecuta sobre el valor.
+# Esto muestra que en Python las funciones son ciudadanos de primera clase.
+# 📌 Nivel Medio – Uso con map, filter, reduce
+# map(f, lista): transforma cada elemento con f
+# filter(f, lista): deja solo donde f da True
+# reduce(f, lista): acumula hasta un solo valor (functools)
+# sorted(..., key=f): ordena según el criterio de f
+# Los HOF se usan mucho con colecciones.
+numeros = [1, 2, 3, 4, 5]
+
+# map → aplica una función a cada elemento
+# Con map sería: list(map(lambda x: x**2, numeros))
+# Sonar/Ruff prefieren list comprehension (misma idea, más clara):
+cuadrados = [x**2 for x in numeros]  # [1, 4, 9, 16, 25]
+
+# filter → selecciona elementos que cumplen condición
+pares = list(filter(lambda x: x % 2 == 0, numeros))  # [2, 4]
+
+# reduce → acumula valores (functools.reduce ya importado arriba)
+suma = reduce(lambda acc, x: acc + x, numeros)  # 15
+# 👉 reduce acumula (acc) los valores de la lista (x) hasta un solo valor.
+# 👉 Concepto: map, filter, reduce son HOF porque reciben funciones como argumento.
+#📌 Nivel Avanzado – Funciones que devuelven funciones (decoradores)
+# Los HOF también pueden crear funciones nuevas.
+def decorador_mayusculas(func):
+    def wrapper(*args, **kwargs):
+        resultado = func(*args, **kwargs)
+        return resultado.upper()
+    return wrapper
+
+@decorador_mayusculas
+def saludar(nombre):
+    return f"Hola {nombre}"
+
+print(saludar("Raúl"))  # → "HOLA RAÚL"
+
+print("\n--- Funciones que devuelven funciones ---")
+def crear_multiplicador(factor):
+    return lambda x: x * factor
+multiplicar_por_2 = crear_multiplicador(2)
+print(multiplicar_por_2(5))  # → 10
+# 👉 Concepto: crear_multiplicador es una función que retorna otra función.
+# Esto es la base mental de los decoradores.
+# 📌 Nivel Experto – Decoradores (funciones que decoran funciones)
+# Los decoradores son funciones que:
+#   1) reciben una función,
+#   2) la decoran (la modifican),
+#   3) retornan la función decorada.
+# Ejemplo:
+def decorar_saludo(funcion):
+    def wrapper(nombre):
+        return f"¡Hola, {nombre}!"
+    return wrapper
+
+@decorar_saludo
+def saludar(nombre):
+    return f"Hola, {nombre}"
+print(saludar("Juan"))  # → "¡Hola, Juan!"
+# 👉 Concepto: decorar_saludo recibe saludar y retorna wrapper.
+# wrapper es la función decorada.
+# 👉 Concepto: decorar_saludo recibe saludar y retorna wrapper.
+# 👉 Concepto: decorador_mayusculas recibe saludar y retorna wrapper.
+# wrapper es la función decorada.
+# 👉 Concepto: decorador_mayusculas recibe saludar y retorna wrapper.
+
+# --- Higher-Order Functions (HOF) en Python ---
+#
+# Nivel Fácil:
+# - Una HOF recibe otra función como argumento.
+# - Ejemplo:
+#   def aplicar(funcion, valor): return funcion(valor)
+#   aplicar(len, "Raúl") → 4
+#
+# Nivel Medio:
+# - HOF aplicadas a colecciones: map, filter, reduce.
+# - map(lambda x: x**2, numeros) → aplica función a cada elemento.
+# - filter(lambda x: x%2==0, numeros) → selecciona pares.
+# - reduce(lambda acc,x: acc+x, numeros) → acumula suma.
+#
+# Nivel Avanzado:
+# - HOF que devuelven funciones → decoradores.
+# - Ejemplo:
+#   def decorador(func): def wrapper(...): return func(...).upper()
+#   @decorador → modifica comportamiento de la función original.
+#
+# --- Buenas prácticas ---
+# - Usar HOF para evitar duplicar lógica.
+# - Preferir funciones puras (sin efectos secundarios).
+# - Decoradores: útiles para validación, logging, autenticación.
+# - map/filter → más expresivos que bucles manuales en algunos casos.
 
 # ============================
 # 🔹 Resumen

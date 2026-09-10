@@ -9,6 +9,10 @@
 #   ./r 01 teoria                → Lecciones/fundamentos/01_*/teoria.py
 #   ./r 04 practica_operaciones  → Lecciones/fundamentos/04_*/practica_operaciones.py
 #   ./r integradores/01          → Lecciones/integradores/01_*/practica.py
+#   ./r integradores/00 14b      → previo repaso, un ejercicio
+#   ./r logica/01                → Lecciones/logica/01_*/practica.py
+#   ./r regex/02 teoria          → Lecciones/regex/02_*/teoria.py
+#   ./r scraping/01              → Lecciones/scraping/01_*/practica.py
 #   ./r ruta/al/archivo.py       → ese archivo
 
 set -e
@@ -23,12 +27,17 @@ fi
 
 run_file() {
   local file="$1"
+  shift
   if [[ ! -f "$file" ]]; then
     echo "No encontré: $file" >&2
     exit 1
   fi
-  echo "→ $PY $file"
-  exec "$PY" "$file"
+  if [[ $# -gt 0 ]]; then
+    echo "→ $PY $file $*"
+  else
+    echo "→ $PY $file"
+  fi
+  exec "$PY" "$file" "$@"
 }
 
 # Sin args: practica.py en el directorio desde donde se invocó (si no, cwd)
@@ -88,14 +97,92 @@ if [[ "$arg1" =~ ^[0-9]{1,2}$ ]]; then
   exit 1
 fi
 
-# integradores: ./r integradores/01
+# integradores:
+#   ./r integradores/01
+#   ./r integradores/00                 → 00_previo_* (primer match) + args
+#   ./r integradores/00_previo 14b      → carpeta que coincida + ejercicio
+#   ./r integradores/00_repaso_presupuesto
 if [[ "$arg1" == integradores/* ]]; then
-  num="${arg1#integradores/}"
-  num=$(printf "%02d" "$((10#$num))")
-  matches=(Lecciones/integradores/"${num}_"*/)
-  run_file "${matches[0]}practica.py"
+  rest="${arg1#integradores/}"
+  extra=("${@:2}")
+
+  # Si viene solo el número (00, 01…), glob num_*
+  if [[ "$rest" =~ ^[0-9]{1,2}$ ]]; then
+    num=$(printf "%02d" "$((10#$rest))")
+    matches=(Lecciones/integradores/"${num}_"*/)
+    if [[ ! -d "${matches[0]}" ]]; then
+      echo "No hay integrador ${num}_*" >&2
+      exit 1
+    fi
+    # Con varios 00_*, preferí el "previo" si existe; si no, el primero.
+    target_dir="${matches[0]}"
+    for m in "${matches[@]}"; do
+      if [[ "$m" == *previo* ]]; then
+        target_dir="$m"
+        break
+      fi
+    done
+    # Si el usuario pidió presupuesto explícitamente vía 2º token especial:
+    if [[ "${extra[0]:-}" == "presupuesto" ]]; then
+      for m in "${matches[@]}"; do
+        if [[ "$m" == *presupuesto* ]]; then
+          target_dir="$m"
+          break
+        fi
+      done
+      extra=("${extra[@]:1}")
+    fi
+    run_file "${target_dir}practica.py" "${extra[@]}"
+  fi
+
+  # Ruta/parcial de carpeta: integradores/00_previo  o  integradores/00_repaso_presupuesto
+  matches=(Lecciones/integradores/*"${rest}"*/)
+  if [[ ! -d "${matches[0]}" ]]; then
+    matches=(Lecciones/integradores/"${rest}"*/)
+  fi
+  if [[ -d "${matches[0]}" ]]; then
+    run_file "${matches[0]}practica.py" "${extra[@]}"
+  fi
+
+  echo "No encontré integrador que coincida con: $rest" >&2
+  echo "Carpetas:" >&2
+  ls -1d Lecciones/integradores/*/ >&2
+  exit 1
+fi
+
+# Area lessons: ./r logica/01  |  ./r regex/02 teoria  |  ./r scraping/01
+if [[ "$arg1" == logica/* || "$arg1" == regex/* || "$arg1" == scraping/* ]]; then
+  area="${arg1%%/*}"
+  rest="${arg1#*/}"
+  kind="${2:-practica}"
+  kind="${kind%.py}"
+  extra=("${@:3}")
+
+  if [[ "$rest" =~ ^[0-9]{1,2}$ ]]; then
+    num=$(printf "%02d" "$((10#$rest))")
+    matches=(Lecciones/"${area}"/"${num}_"*/)
+  else
+    matches=(Lecciones/"${area}"/*"${rest}"*/)
+  fi
+
+  if [[ ! -d "${matches[0]}" ]]; then
+    echo "No hay lección ${area}/${rest}" >&2
+    ls -1d Lecciones/"${area}"/*/ 2>/dev/null >&2 || true
+    exit 1
+  fi
+
+  lesson_dir="${matches[0]}"
+  if [[ "$kind" == "teoria" ]]; then
+    run_file "${lesson_dir}teoria.py" "${extra[@]}"
+  fi
+  if [[ -f "${lesson_dir}${kind}.py" ]]; then
+    run_file "${lesson_dir}${kind}.py" "${extra[@]}"
+  fi
+  echo "No encontré ${kind}.py en ${lesson_dir}" >&2
+  ls -1 "$lesson_dir"*.py 2>/dev/null >&2 || true
+  exit 1
 fi
 
 echo "No entendí: $*" >&2
-echo "Ejemplos: ./r 01  |  ./r 01 teoria  |  ./r 04 practica_operaciones  |  ./r integradores/01" >&2
+echo "Ejemplos: ./r 01  |  ./r 01 teoria  |  ./r integradores/00 14b  |  ./r logica/01  |  ./r regex/02 teoria  |  ./r scraping/01" >&2
 exit 1

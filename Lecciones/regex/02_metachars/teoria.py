@@ -1,127 +1,127 @@
-###
-# 02 - Meta caracteres
-# Los metacaracteres son simbolos especiales con significados especificos en las expresiones regulares
-###
+# ============================
+# 📘 Regex 02 — Metacaracteres
+# ============================
+# Los metacaracteres son símbolos con significado especial en regex.
+# Ejemplos: . ^ $ \ | ( ) [ ] { } * + ?
+#
+# Para buscar el símbolo LITERAL, hay que escaparlo: \. \$ \|
+# Siempre preferí raw strings: r"\d", r"\.", r"\b"
 
 import re
 
-# 1. El punto (.)
-# Coincidir con cualquier caracter excepto una nueva linea
+# ============================
+# 🔹 El punto (.) — cualquier carácter (salvo salto de línea)
+# ============================
+# "." matchea UN carácter cualquiera (no \n por defecto).
+print("--- El punto (.) ---")
 
-text = "Hola mundo, H0la de nuevo, H$la otra vez"
-pattern = "H.la" # Hola, H0la, H$la
+texto = "Hola mundo, H0la de nuevo, H$la otra vez"
+patron = r"H.la"  # H + cualquier char + la
+print("findall H.la:", re.findall(patron, texto))
 
-found = re.findall(pattern, text)
-
-if (found):
-  print(found)
-else:
-  print("No se ha encontrado el patrón")
-
-
-text = "casa caasa cosa cisa cesa causa"
-pattern = "c.sa"
-
-matches = re.findall(pattern, text)
-print(matches)
-
-# --------------------
-
-text = "Hola mundo, H0la de nuevo, H$la otra vez"
-pattern = r"H.la" # Hola, H0la, H$la
-
-found = re.findall(pattern, text)
-
-if (found):
-  print(found)
-else:
-  print("No se ha encontrado el patrón")
+texto2 = "casa caasa cosa cisa cesa causa"
+print("findall c.sa:", re.findall(r"c.sa", texto2))
+# Tip: "caasa" NO matchea c.sa (hay dos 'a' entre c y s).
 
 
-# Cómo usar la barra invertida para anular el significado especial de un símbolo
-text = "Mi casa es blanca. Y el coche es negro."
-pattern = r"\."
+# ============================
+# 🔹 Escapar metacaracteres
+# ============================
+# Si querés el punto literal ".", usá r"\."
+print("\n--- Escapes (\\.) ---")
 
-matches = re.findall(pattern, text)
+texto = "Mi casa es blanca. Y el coche es negro."
+print("puntos literales:", re.findall(r"\.", texto))
 
-print(matches)
+# Tip: r"\$" busca el signo pesos; r"\|" busca la barra vertical.
 
-# \d: coincide con cualquier dígito (0-9)
 
-text = "El número de teléfono es 123456789"
-found = re.findall(r'\d{9}', text)
+# ============================
+# 🔹 \d \w \s — clases abreviadas
+# ============================
+# \d → dígito [0-9]
+# \w → "word char": letra, dígito o _  (aprox. [a-zA-Z0-9_])
+# \s → espacio en blanco (espacio, tab, \n, …)
+# Mayúscula invierte: \D no-dígito, \W no-word, \S no-espacio
+print("\n--- \\d \\w \\s ---")
 
-print(found)
+texto = "El número de teléfono es 123456789"
+print(r"\d{9}:", re.findall(r"\d{9}", texto))
 
-# Ejercicio: Detectar si hay un número de España en el texto gracias al prefijo +34
+# SOLVED mini-demo: teléfono con prefijo +34
+texto_tel = "Mi número de teléfono es +34 688999999 apúntalo vale?"
+m = re.search(r"\+34 \d{9}", texto_tel)
+if m:
+    print("teléfono:", m.group())
 
-text = "Mi número de teléfono es +34 688999999 apúntalo vale?"
-pattern = r"\+34 \d{9}"
-found = re.search(pattern, text)
-if found: print(f"Encontré el número de teléfono {found.group()}")
+usuario = "el_rubius_69"
+print(r"\w chars:", re.findall(r"\w", usuario))
 
-# \w: Coincide con cualquier caracter alfanumerico (a-z, A-Z, 0-9, _)
+texto_ws = "Hola mundo\n¿Cómo estás?\t"
+print(r"\s count:", len(re.findall(r"\s", texto_ws)))
 
-text = "el_rubius_69"
-pattern = r"\w"
-found = re.findall(pattern, text)
-print(found)
 
-# \s: Coincide con cualqueir espacio en blanco (espacio, tabulación, salto de línea)
-text = "Hola mundo\n¿Cómo estás?\t"
-pattern = r"\s"
-matches = re.findall(pattern, text)
-print(matches)
+# ============================
+# 🔹 ^ y $ — inicio y fin de cadena
+# ============================
+# ^ → ancla al INICIO del string
+# $ → ancla al FINAL del string
+# Tip: sin ^/$ el patrón puede matchear en cualquier parte.
+print("\n--- ^ y $ ---")
 
-# ^: Coincide con el principio de una cadena
-username = "423_name%22" 
-pattern = r"^\w" # validar nombre de usuario
-
-valid = re.search(pattern, username)
-
-if valid: print("El nombre de usuario es válido")
-else: print("El nombre de usuario no es válido")
+username = "423_name%22"
+if re.search(r"^\w", username):
+    print("empieza con word-char")
 
 phone = "+34 688999999"
-pattern = r"^\+\d{1,3} "
+if re.search(r"^\+\d{1,3} ", phone):
+    print("prefijo internacional OK")
 
-valid = re.search(pattern, phone)
+# "mundo$" falla si hay un punto después
+print("mundo$ en 'Hola mundo.':", bool(re.search(r"mundo$", "Hola mundo.")))
+print("mundo\\.$ en 'Hola mundo.':", bool(re.search(r"mundo\.$", "Hola mundo.")))
 
-if valid: print("El número de teléfono es válido")
-else: print("El número de teléfono no es válido")
+# SOLVED mini-demo: ¿termina en @gmail.com?
+email = "miduga@hotmail.com"
+print("es gmail?:", bool(re.search(r"@gmail\.com$", email)))
 
-# $: Coincide con el final de una cadena
-text = "Hola mundo."
-pattern = r"mundo$"
 
-valid = re.search(pattern, text)
+# ============================
+# 🔹 \b — límite de palabra
+# ============================
+# \b es el "borde" entre un \w y un no-\w (o inicio/fin).
+# Sirve para no matchear "casa" dentro de "casada".
+print("\n--- \\b (word boundary) ---")
 
-if valid: print("La cadena es válida")
-else: print("La cadena no es válida")
+texto = "casa casada cosa cosas casado casa"
+print(r"\bc.sa\b:", re.findall(r"\bc.sa\b", texto))
 
-# EJERCICIO
-# Valida que un correo sea de gmail
-text = "miduga@hotmail.com"
-pattern = r"@gmail.com$"
-valid = re.search(pattern, text)
-
-if valid: print("El correo es gmail válido")
-else: print("El correo no es válido")
-
-# EJERCICIO:
-# Tenemos una lista de archivos, necesitamos saber los nombres de los ficheros con extension .txt
+# SOLVED mini-demo: archivos .txt
 files = "file1.txt file2.pdf midu-of.webp secret.txt"
+print("archivos .txt:", re.findall(r"\b\w+\.txt\b", files))
 
-# \b: Coincide con el principio o final de una palabra
-text = "casa casada cosa cosas casado casa"
-pattern = r"\bc.sa\b"
 
-found = re.findall(pattern, text)
-print(found)
+# ============================
+# 🔹 | — alternancia (OR)
+# ============================
+# A|B matchea A o B. La izquierda se prueba primero.
+print("\n--- | (alternancia) ---")
 
-# |: Coincidr con una opción u otra
-fruits = "platano, piña, manzana, aguacate, palta, pera, aguacate, aguacate"
-pattern = r"palta|aguacate|p..a|\b\w{7}\b"
+fruits = "platano, piña, manzana, aguacate, palta, pera, aguacate"
+patron = r"palta|aguacate|pera"
+print("frutas:", re.findall(patron, fruits))
 
-matches = re.findall(pattern, fruits)
-print(matches)
+# Tip: agrupá con ( ) si combinás | con más patrón: r"(gato|perro)s"
+
+# ============================
+# 🔹 Resumen
+# ============================
+# - . → un carácter cualquiera (no \n)
+# - \. \$ \| → literales escapados
+# - \d dígito | \w word | \s whitespace (+ mayúsculas = inverso)
+# - ^ inicio | $ fin
+# - \b borde de palabra
+# - | alternativa
+# - Usá r"..." siempre que haya barras
+#
+# Práctica: practica.py (misma carpeta)

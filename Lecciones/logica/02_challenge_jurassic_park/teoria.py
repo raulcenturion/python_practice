@@ -1,33 +1,72 @@
-"""
-En Jurassic Park, se ha observado que los dinosaurios carnívoros, como el temible T-Rex, depositan un número par de huevos. Imagina que tienes una lista de números enteros en la que cada número representa la cantidad de huevos puestos por un dinosaurio en el parque.
+# ============================
+# 📘 Challenge: Jurassic Park — huevos de carnívoros
+# ============================
+# Historia: en Jurassic Park, los dinosaurios carnívoros (T-Rex)
+# depositan un número PAR de huevos. Cada número de la lista es
+# la cantidad de huevos que puso un dinosaurio.
+#
+# Qué hacemos:
+#   Sumar solo los números pares de una lista.
+#
+# Por qué:
+#   Práctica de filtro + acumulación (bucles, % 2, sum/filter).
+#
+# Cómo:
+#   Recorrer la lista; si n % 2 == 0, sumar n al total.
 
-Importante: Solo se consideran los huevos de los dinosaurios carnívoros (T-Rex) aquellos números que son pares.
+# ============================
+# 🔹 Recordatorio: ¿par o impar?
+# ============================
+print("--- Recordatorio: módulo % ---")
+print("n % 2 == 0 → par")
+print("n % 2 == 1 → impar")
+print("Ejemplo: 4 % 2 =", 4 % 2, "| 7 % 2 =", 7 % 2)
 
-Objetivo:
-Escribe una función en Python que reciba una lista de números enteros y devuelva la suma total de los huevos que pertenecen a los dinosaurios carnívoros (es decir, la suma de todos los números pares en la lista).
-"""
 
-from os import system
-if system("clear") != 0: system("cls")
+# ============================
+# 🔹 Solución con bucle
+# ============================
+print("\n--- Solución con bucle ---")
 
-# Para ver si un número es par
-# siempre usamos el módulo %
-# nos da el resto de la división: eggs % 2 == 2
 
-def count_carnivore_dinosaur_eggs(egg_list) -> int:
-  """
-  Esta función recibe una lista de numeros enteros que representan la cantidad de huevos que han puesto diferentes dinosaurios en el parque jurásico y los de número par son de carnívoros. Devuelve un número con la suma de todos los huevos de carnívoros.
-  """
-  total_carnivore_eggs = 0
+def count_carnivore_dinosaur_eggs(egg_list: list[int]) -> int:
+    """Suma solo los números pares (huevos de carnívoros)."""
+    total = 0
+    for eggs in egg_list:
+        # Qué: ¿este dinosaurio es carnívoro? → cantidad par.
+        if eggs % 2 == 0:
+            total += eggs
+            print(f"  + {eggs} (par) → total parcial = {total}")
+        else:
+            print(f"  se ignora {eggs} (impar)")
+    return total
 
-  for eggs in egg_list:
-    if eggs % 2 == 0:
-      total_carnivore_eggs += eggs
 
-  # esta forma más corta:
-  # total_carnivore_eggs = sum(filter(lambda x: x % 2 == 0, egg_list))
+# Tip (forma corta con filter + sum):
+#   return sum(filter(lambda x: x % 2 == 0, egg_list))
+# Tip (comprensión):
+#   return sum(n for n in egg_list if n % 2 == 0)
 
-  return total_carnivore_eggs
 
+# ============================
+# 🔹 Demos
+# ============================
+print("\n--- Demo 1: [3, 4, 7, 5, 8] ---")
 egg_list = [3, 4, 7, 5, 8]
-print(count_carnivore_dinosaur_eggs(egg_list)) # 12
+resultado = count_carnivore_dinosaur_eggs(egg_list)
+print(f"Suma de pares = {resultado}")  # 4 + 8 = 12
+
+print("\n--- Demo 2: solo impares ---")
+print("resultado:", count_carnivore_dinosaur_eggs([1, 3, 5]))  # 0
+
+print("\n--- Demo 3: [2, 3, 4, 5, 6] ---")
+print("resultado:", count_carnivore_dinosaur_eggs([2, 3, 4, 5, 6]))  # 12
+
+
+# ============================
+# 🔹 Resumen
+# ============================
+# - Par: n % 2 == 0
+# - Acumulá en un total solo los pares.
+# - Alternativas: sum(filter(...)) o sum(... for ... if ...)
+# - Lista vacía o sin pares → 0

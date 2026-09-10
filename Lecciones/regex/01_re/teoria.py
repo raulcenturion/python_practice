@@ -1,111 +1,119 @@
-# Regex
-# Expresiones regulares en Python
-# Las expresiones regulares son una herramienta poderosa para buscar y manipular texto basándose en patrones específicos.
-# Se utilizan comúnmente para validar formatos de entrada, buscar y reemplazar texto, y extraer información de cadenas.
+# ============================
+# 📘 Regex 01 — Módulo re
+# ============================
+# Una expresión regular (regex) es un patrón que describe texto.
+# En Python vivimos en el módulo `re`: search, findall, finditer, sub, flags…
+#
+# ¿Para qué sirve?
+# - Buscar patrones en textos grandes
+# - Validar formatos (email, teléfono, códigos)
+# - Extraer y reemplazar partes de un string
+#
+# ⚠️ Preferí raw strings: r"..."
+# En raw strings la barra \ no se "come" el siguiente carácter.
+# Tip: r"\d" es el patrón "dígito"; "\\d" es lo mismo pero más feo de leer.
 
-##
-# 01 - Expresiones regulares
-# 
-
-""" Las expresiones regulares son una secuencia de caracteres que forman un patrón de búsqueda.
-    Se utilizan para la búsqueda de cadenas de texto, validación de datos, etc. """
-
-
-""" ¿Por qué aprender Regex?
-
-- Búsqueda avanzada: Encontrar patrones específicos en textos grandes de forma rápida y precisa. (un editor de Markdown sólo usando Regex)
-
-- Validación de datos: Asegurarte que los datos que ingresa un usuario como el email, teléfono, etc. son correctos.
-
-- Manipulación del texto: Extraer, reemplazar y modificar partes de la cadena de texto fácilmente
-"""
-
-# 1. Importar el módulo de expresiones regulares "re"
 import re
-# 2. Crear un patrón, que es una cadena de texto que describe lo que queremos encontrar
-pattern = "Hola"
-# 3. El texto donde queremos buscar
-text = "Hola mundo"
-# 4. Usar la función de búsqueda de "re"
-result = re.search(pattern, text)
 
-if result:
-  print("He encontrado el patrón en el texto")
+# ============================
+# 🔹 re.search — primera coincidencia
+# ============================
+# search(patrón, texto) → Match o None.
+# No exige que el patrón esté al inicio (eso es más bien re.match).
+print("--- re.search ---")
+
+patron = r"Hola"  # raw string: buena costumbre desde el día 1
+texto = "Hola mundo"
+resultado = re.search(patron, texto)
+
+if resultado:
+    print("Encontré el patrón")
+    # .group() → el texto que coincidió
+    print("group():", resultado.group())
+    # .start() / .end() → índices [inicio, fin) en el string original
+    print("start():", resultado.start(), "| end():", resultado.end())
 else:
-  print("No he encontrado el patrón en el texto")
+    print("No encontré el patrón")
 
-# .group() devuelve la cadena que coincide con el pattern
-print(result.group())
+# Tip (SOLVED mini-demo): buscar "IA" y mostrar posición
+# texto_ia = "Todo el mundo dice que la IA nos va a quitar el trabajo."
+# m = re.search(r"IA", texto_ia)
+# print(m.start(), m.end())  # 28 30
 
-# .start() devolver la posición inicial de la coincidencia
-print(result.start())
 
-# .end() devolver la posición final de la coincidencia
-print(result.end())
+# ============================
+# 🔹 re.findall — todas las coincidencias (lista)
+# ============================
+# findall → lista de strings (o tuplas si hay grupos).
+# Útil cuando solo te importa QUÉ encontró, no dónde.
+print("\n--- re.findall ---")
 
-# EJERCICIO 01
-# Encuentra la primera ocurrencia de la palabra "IA" en el siguiente texto
-# e indica en que posición empieza y termina la coincidencia.
-text = "Todo el mundo dice que la IA nos va a quitar el trabajo. Pero solo hace falta ver cómo la puede cagar con las Regex para ir con cuidado"
-pattern = "IA"
-found_ia = re.search(pattern, text)
+texto = "Me gusta Python. Python es lo máximo. Aunque Python no es tan difícil, ojo con Python"
+patron = r"Python"
+coincidencias = re.findall(patron, texto)
+print("findall:", coincidencias)
+print("cantidad:", len(coincidencias))
 
-if found_ia:
-  print(f"He encontrado el patrón en el texto en la posición {found_ia.start()} y termina en la posición {found_ia.end()}")
-else:
-  print("No he encontrado el patrón en el texto")
 
-# -----------------------
+# ============================
+# 🔹 re.finditer — todas con posición
+# ============================
+# finditer → iterador de objetos Match (group, start, end en cada uno).
+# Ideal cuando necesitás el texto Y la posición.
+print("\n--- re.finditer ---")
 
-### Encontrar todas las coincidencias de un patrón
-# .findall() devuelve una lista con todas las coincidencias
+for match in re.finditer(r"Python", texto):
+    print(match.group(), "→", match.start(), match.end())
 
-text = "Me gusta Python. Python es lo máximo. Aunque Python no es tan difícil, ojo con Python"
-pattern = "Python"
+# Tip: list(re.finditer(...)) materializa todos los Match si los querés en memoria.
 
-matches = re.findall(pattern, text)
 
-print(len(matches))
+# ============================
+# 🔹 re.IGNORECASE — mayúsculas / minúsculas
+# ============================
+# Flags cambian el comportamiento del patrón sin reescribirlo.
+# IGNORECASE (o re.I) hace que "IA" también matchee "ia" e "Ia".
+print("\n--- re.IGNORECASE ---")
 
-# -------------------------
+texto = "Todo el mundo dice que la IA nos va a quitar el trabajo. Pero la ia no es tan mala. ¡Viva la Ia!"
+encontradas = re.findall(r"IA", texto, flags=re.IGNORECASE)
+print("findall IGNORECASE:", encontradas)
 
-# iter() devuelve un iterador que contiene todos los resultados de la búsqueda
+# Tip: también podés pasar flags a search/sub/finditer.
 
-text = "Me gusta Python. Python es lo máximo. Aunque Python no es tan difícil, ojo con Python"
-pattern = "Python"
 
-matches = re.finditer(pattern, text)
+# ============================
+# 🔹 re.sub — reemplazar coincidencias
+# ============================
+# sub(patrón, reemplazo, texto, flags=...) → nuevo string.
+# Reemplaza TODAS las coincidencias (salvo que uses count=).
+print("\n--- re.sub ---")
 
-for match in matches:
-  print(match.group(), match.start(), match.end())
+texto = "Hola, mundo! Hola de nuevo. Hola otra vez."
+nuevo = re.sub(r"hola", "Adiós", texto, flags=re.IGNORECASE)
+print("sub:", nuevo)
 
-# EJERCICIO 02
-# Encuentra todas las ocurrencias de la palabra "midu" en el siguiente texto e indica en que posición empieza y termina cada coincidencia y cuantas veces se encontró.
-text = "Este es el curso de Python de midudev. ¡Suscríbete a midudev si te gusta este contenido! midu"
+# Tip: re.sub(r"\d", "*", "abc123") → "abc***"
 
-### Modificadores
 
-# Los modificadores son opciones que se pueden agregar a un patrón para cambiar su comportamiento
+# ============================
+# 🔹 Match: group / start / end (repaso)
+# ============================
+print("\n--- Match.group / start / end ---")
 
-# re.IGNORECASE: Ignora las mayúsculas y minúsculas
+m = re.search(r"mundo", "Hola mundo cruel")
+if m:
+    print(f"'{m.group()}' va de {m.start()} a {m.end()}")
 
-text = "Todo el mundo dice que la IA nos va a quitar el trabajo. Pero la ia no es tan mala. ¡Viva la Ia!"
-pattern = "IA"
-found = re.findall(pattern, text, re.IGNORECASE)
-
-if found: print(found)
-
-# EJERCICIO 03
-# Encuentra todas las ocurrencias de la palabra "python" en el siguiente texto, sin distinguir entre mayúsculas y minúsculas.
-text = "Este es el curso de Python de midudev. ¡Suscríbete a python si te gusta este contenido! PYTHON"
-
-### Reemplazar el texto
-
-# .sub() reemplaza todas las coincidencias de un patrón en un texto
-
-text = "Hola, mundo! Hola de nuevo. Hola otra vez."
-pattern = "hola"
-replacement = "Adiós"
-
-new_text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
-print(new_text)
+# ============================
+# 🔹 Resumen
+# ============================
+# - import re + patrones en r"..."
+# - search → primer Match | None
+# - findall → lista de coincidencias
+# - finditer → Matches con posición
+# - IGNORECASE → no distingue mayúsculas
+# - sub → reemplaza
+# - Match: .group(), .start(), .end()
+#
+# Práctica: practica.py (misma carpeta)

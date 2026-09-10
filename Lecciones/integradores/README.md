@@ -1,16 +1,50 @@
 # Integradores — cierre del repo (antes de FastAPI)
 
-## Repaso intermedio (después de la lección 10 / 13)
+## Orden recomendado
+
+1. **Previo:** repaso guiado por ejercicio (`00_previo_repaso_fundamentos`)
+2. **Repaso CLI:** mini presupuesto (`00_repaso_presupuesto_cli`)
+3. Integradores 01 → 03
+
+---
+
+## 00 — Previo: repaso guiado de fundamentos
+
+| Carpeta | Qué es |
+|---------|--------|
+| `00_previo_repaso_fundamentos/` | 1–2 ejercicios por tema (01–20) con guía + tip comentado |
+
+Corré **un ejercicio por vez** (no tira todos juntos):
+
+```bash
+./r integradores/00 --list
+./r integradores/00 01a
+./r integradores/00 14b
+./r integradores/00 20c
+```
+
+Si hay dos carpetas `00_*`, `./r integradores/00` apunta al **previo**.  
+Para el presupuesto CLI:
+
+```bash
+./r integradores/00 presupuesto
+# o
+./r integradores/00_repaso_presupuesto
+```
+
+---
+
+## Repaso intermedio (presupuesto CLI)
 
 | # | Proyecto | Nivel | Carpeta |
 |---|----------|-------|---------|
 | 00 | Mini presupuesto CLI | Repaso 01→10 + 13 | `00_repaso_presupuesto_cli/` |
 
-Hacelo **antes** de los integradores “grandes” si querés asentar la base.
-El `enunciado.md` trae un **checklist por lección** (print/sep/end, tipos, casting, ops, input, if/bool, listas, while/continue, for/enumerate/range, funciones, try/except). Todo el flujo es por terminal.
+Hacelo **después** del previo si querés asentar la base en un proyecto chico.
+El `enunciado.md` trae un **checklist por lección**. Todo el flujo es por terminal.
 
 ```bash
-./r integradores/00
+./r integradores/00 presupuesto
 ```
 
 ## Integradores de cierre
@@ -31,7 +65,8 @@ Hacé estos **en orden**. Cada uno suma temas; el último simula el estilo FastA
 
 ## Mapa rápido de temas
 
-- **00** → print, tipos, casting, variables, input, if, listas, while, for, funciones, try/except  
+- **00 previo** → ejercicios sueltos 01–20 (incluye decoradores, ficheros/JSON, async, Pydantic)  
+- **00 presupuesto** → print, tipos, casting, variables, input, if, listas, while, for, funciones, try/except  
 - **01** → funciones, menú, dict/list, JSON, excepciones básicas  
 - **02** → POO, módulos, excepción propia, decorador, JSON  
 - **03** → decoradores tipo ruta, Pydantic, async/await (puente a FastAPI)
