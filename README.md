@@ -20,6 +20,7 @@ Lecciones/
   regex/
   scraping/
   integradores/    → repaso + proyectos de cierre
+fastApi/           → teorías y prácticas de FastAPI (siguiente etapa)
 ```
 
 Cada lección:
@@ -90,3 +91,19 @@ Si el tema necesita más de un archivo de teoría:
 | 03 | `integradores/03_mini_api_biblioteca` | Difícil | rutas con `@`, Pydantic, async (+ `tips.md`) |
 
 Detalle en `Lecciones/integradores/README.md`.
+
+## FastAPI
+
+Carpeta en la raíz: `fastApi/` (venv del repo ya tiene FastAPI + Uvicorn).
+
+```bash
+# Levantar hola mundo
+source .venv/bin/activate
+uvicorn fastApi.00_hola_fastapi.main:app --reload
+
+# Teoría / práctica
+./r fastapi/00 teoria
+./r fastapi/00
+```
+
+Docs: http://127.0.0.1:8000/docs — detalle en `fastApi/README.md`.

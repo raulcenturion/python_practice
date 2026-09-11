@@ -1,74 +1,101 @@
-# 1. Introducción a las Clases en Python
-# Las clases son plantillas para crear objetos. Un objeto es una instancia de una clase.
-# Nos permite agrupar datos (atributos o propiedades) y funciones (métodos) en un solo lugar.
-
-OPENAI_KEY = ""
-DEEPSEEK_API_KEY = ""
-
-# Ejemplo básico de una clase
-class Coche:
-  # atributo de clase (comparte todas las instancias)
-  tipo = "vehículo de cuatro ruedas"
-  ruedas = 4
-
-  # método especial que es el que construye el objeto
-  # se llama automáticamente este método cuando creas la instancia
-  def __init__(self, marca, modelo, color):
-    # atributos de la instancia
-    self.marca = marca
-    self.modelo = modelo
-    self.color = color
-
-  def arrancar(self):
-    print(f"El coche {self.marca} {self.modelo} arrancó! 🚗")
-
-
-mi_coche = Coche("Toyota", "Corolla", "rojo")
-mi_coche.arrancar()
-
-print(mi_coche.marca)
-
-coche_de_pheralb = Coche("Ford", "Fiesta", "azul")
-coche_de_pheralb.arrancar()
-
-print(coche_de_pheralb.marca)
-
-# Encapsulación: es ocultar los detalles internos de una clase y exponer solo la interfaz pública
-
-# Crear una clase para llamar a la AI de OpenAI, DeepSeek O LO QUE SEA
+# ============================
+# 📘 Clases + cliente HTTP (repaso POO)
+# ============================
+# Idea: una clase agrupa datos + comportamiento.
+# Acá repasamos POO y armamos un cliente simple para una API pública
+# (jsonplaceholder), sin claves secretas.
 
 import requests
 
-class AI_API:
-  def __init__(self, api_key, url, model):
-    self.api_key = api_key
-    self.url = url
-    self.model = model
+# ============================
+# 🔹 Clase básica (atributos + métodos)
+# ============================
+print("--- Clase Coche ---")
 
-  def call(self, prompt):
-    headers = {
-      "Content-Type": "application/json",
-      "Authorization": f"Bearer {self.api_key}"
-    }
-    data = {
-      "model": self.model,
-      "messages": [{"role": "user", "content": prompt}]
-    }
 
-    try:
-      response = requests.post(self.url, json=data, headers=headers)
-      res_json = response.json()
-      print(res_json["choices"][0]["message"]["content"])
-    except requests.exceptions.RequestException as e:
-      print(f"Error en la solicitud: {e}")
-      return None
+class Coche:
+    # Atributo de CLASE: compartido por todas las instancias
+    tipo = "vehículo de cuatro ruedas"
+    ruedas = 4
 
-print("\nOPEN_AI:")
-openai_api = AI_API(OPENAI_KEY, "https://api.openai.com/v1/chat/completions", "gpt-4o-mini")
+    def __init__(self, marca: str, modelo: str, color: str):
+        # Atributos de INSTANCIA: propios de cada objeto
+        self.marca = marca
+        self.modelo = modelo
+        self.color = color
 
-openai_api.call("Escribe un breve poema sobre la programación")
+    def arrancar(self) -> str:
+        # Método de instancia: usa self para leer datos del objeto
+        return f"El coche {self.marca} {self.modelo} arrancó!"
 
-print("\nDEEPSEEK:")
-deepseek_api = AI_API(DEEPSEEK_API_KEY, "https://api.deepseek.com/chat/completions", "deepseek-chat")
 
-deepseek_api.call("Escribe un breve poema sobre la programación")
+mi_coche = Coche("Toyota", "Corolla", "rojo")
+otro = Coche("Ford", "Fiesta", "azul")
+print(mi_coche.arrancar())
+print(otro.arrancar())
+print("tipo (clase):", Coche.tipo, "| ruedas:", mi_coche.ruedas)
+
+# TIP:
+# class Nombre:
+#     def __init__(self, ...):
+#         self.x = ...
+#     def metodo(self):
+#         return self.x
+
+# ============================
+# 🔹 Cliente HTTP encapsulado
+# ============================
+print("\n--- Clase JsonPlaceholderClient ---")
+
+
+class JsonPlaceholderClient:
+    """Cliente mínimo: guarda la base URL y ofrece get_post(id)."""
+
+    def __init__(self, base_url: str = "https://jsonplaceholder.typicode.com"):
+        # Guardamos config en la instancia (no hardcodeamos en cada método)
+        self.base_url = base_url.rstrip("/")
+
+    def get_post(self, post_id: int) -> dict | None:
+        # Armamos la URL y pedimos el recurso
+        url = f"{self.base_url}/posts/{post_id}"
+        try:
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()  # error HTTP → excepción
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            print(f"Error en la solicitud: {e}")
+            return None
+
+    def list_titles(self, limit: int = 3) -> list[str]:
+        url = f"{self.base_url}/posts"
+        try:
+            posts = requests.get(url, timeout=10).json()
+            return [p["title"] for p in posts[:limit]]
+        except requests.exceptions.RequestException as e:
+            print(f"Error en la solicitud: {e}")
+            return []
+
+
+client = JsonPlaceholderClient()
+post = client.get_post(1)
+if post:
+    print("Post 1 title:", post["title"])
+print("Primeros títulos:", client.list_titles(3))
+
+# TIP — APIs con Bearer (solo patrón, no ejecutar con keys vacías):
+# class ChatClient:
+#     def __init__(self, api_key: str, url: str, model: str):
+#         self.api_key = api_key
+#         self.url = url
+#         self.model = model
+#     def call(self, prompt: str) -> str | None:
+#         headers = {"Authorization": f"Bearer {self.api_key}"}
+#         ...
+
+# ============================
+# 🔹 Resumen
+# ============================
+# - class + __init__ + self
+# - atributo de clase vs de instancia
+# - encapsular requests dentro de métodos de una clase
+# - raise_for_status() + try/except RequestException

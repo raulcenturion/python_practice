@@ -13,6 +13,7 @@
 #   ./r logica/01                → Lecciones/logica/01_*/practica.py
 #   ./r regex/02 teoria          → Lecciones/regex/02_*/teoria.py
 #   ./r scraping/01              → Lecciones/scraping/01_*/practica.py
+#   ./r fechas/01 teoria         → Lecciones/fechas/01_*/teoria.py
 #   ./r ruta/al/archivo.py       → ese archivo
 
 set -e
@@ -150,9 +151,13 @@ if [[ "$arg1" == integradores/* ]]; then
   exit 1
 fi
 
-# Area lessons: ./r logica/01  |  ./r regex/02 teoria  |  ./r scraping/01
-if [[ "$arg1" == logica/* || "$arg1" == regex/* || "$arg1" == scraping/* ]]; then
+# Area lessons: ./r logica/01  |  ./r regex/02 teoria  |  ./r scraping/01  |  ./r fechas/01  |  ./r fastapi/00
+if [[ "$arg1" == logica/* || "$arg1" == regex/* || "$arg1" == scraping/* || "$arg1" == fechas/* || "$arg1" == fastapi/* ]]; then
   area="${arg1%%/*}"
+  # En disco la carpeta se llama fastApi (camelCase)
+  if [[ "$area" == "fastapi" ]]; then
+    area="fastApi"
+  fi
   rest="${arg1#*/}"
   kind="${2:-practica}"
   kind="${kind%.py}"
@@ -161,13 +166,25 @@ if [[ "$arg1" == logica/* || "$arg1" == regex/* || "$arg1" == scraping/* ]]; the
   if [[ "$rest" =~ ^[0-9]{1,2}$ ]]; then
     num=$(printf "%02d" "$((10#$rest))")
     matches=(Lecciones/"${area}"/"${num}_"*/)
+    # fastApi vive en la raíz, no bajo Lecciones/
+    if [[ "$area" == "fastApi" ]]; then
+      matches=("${area}"/"${num}_"*/)
+    fi
   else
-    matches=(Lecciones/"${area}"/*"${rest}"*/)
+    if [[ "$area" == "fastApi" ]]; then
+      matches=("${area}"/*"${rest}"*/)
+    else
+      matches=(Lecciones/"${area}"/*"${rest}"*/)
+    fi
   fi
 
   if [[ ! -d "${matches[0]}" ]]; then
     echo "No hay lección ${area}/${rest}" >&2
-    ls -1d Lecciones/"${area}"/*/ 2>/dev/null >&2 || true
+    if [[ "$area" == "fastApi" ]]; then
+      ls -1d fastApi/*/ 2>/dev/null >&2 || true
+    else
+      ls -1d Lecciones/"${area}"/*/ 2>/dev/null >&2 || true
+    fi
     exit 1
   fi
 
@@ -184,5 +201,5 @@ if [[ "$arg1" == logica/* || "$arg1" == regex/* || "$arg1" == scraping/* ]]; the
 fi
 
 echo "No entendí: $*" >&2
-echo "Ejemplos: ./r 01  |  ./r 01 teoria  |  ./r integradores/00 14b  |  ./r logica/01  |  ./r regex/02 teoria  |  ./r scraping/01" >&2
+echo "Ejemplos: ./r 01  |  ./r 01 teoria  |  ./r integradores/00 14b  |  ./r logica/01  |  ./r fechas/01 teoria  |  ./r scraping/01" >&2
 exit 1

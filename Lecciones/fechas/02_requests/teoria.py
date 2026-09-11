@@ -1,109 +1,119 @@
-# Cómo hacer peticiones a APIs con Python
-# con y sin dependencias
+# ============================
+# 📘 HTTP / APIs con Python
+# ============================
+# Dos caminos:
+#   1) urllib (stdlib) → sin instalar nada
+#   2) requests (pip)  → API más cómoda (recomendado)
+#
+# Usamos jsonplaceholder.typicode.com (API de prueba pública, sin API key).
+# Tip: NUNCA subas claves reales al repo. Usá variables de entorno.
 
-# 1. Sin dependencias (díficil y sin dependencias)
+import json
+import urllib.error
 import urllib.request
-import json
 
-DEEPSEEK_API_KEY = "xxx"
+# ============================
+# 🔹 GET sin dependencias (urllib)
+# ============================
+print("--- GET con urllib (stdlib) ---")
 
-api_posts = "https://jsonplaceholder.typicode.com/posts/"
-
+url = "https://jsonplaceholder.typicode.com/posts/1"
+# urlopen abre la URL; read() trae bytes; decode → str; loads → dict
 try:
-  response = urllib.request.urlopen(api_posts)
-  data = response.read()
-  json_data = json.loads(data.decode('utf-8'))
-  print(json_data)
-  response.close()
+    with urllib.request.urlopen(url, timeout=10) as response:
+        raw = response.read().decode("utf-8")
+        data = json.loads(raw)
+        print("status implícito OK")
+        print("title:", data["title"])
 except urllib.error.URLError as e:
-  print(f"Error en la solicitud: {e}")
+    # Tip: en algunos macOS, urllib falla por certificados SSL.
+    # Si ves CERTIFICATE_VERIFY_FAILED, usá requests (más abajo) o instalá certs.
+    print("Error de red/URL:", e)
 
+# TIP / patrón:
+# with urllib.request.urlopen(url, timeout=10) as r:
+#     data = json.loads(r.read().decode("utf-8"))
 
-# 2. Con dependencia (requests)
-import requests
+# ============================
+# 🔹 GET con requests
+# ============================
+print("\n--- GET con requests ---")
 
-print("\nGET:")
-api_posts = "https://jsonplaceholder.typicode.com/posts/"
-response = requests.get(api_posts)
-response_json = response.json()
-
-# 3. Un POST
-print("\nPOST:")
 try:
-  response = requests.post(
-    "https://jsonplaceholder.typicode.com/posts",
-    json={
-      "title": "foo",
-      "body": "bar",
-      "userId": 1
-    })
-  print(response.status_code)
-except requests.exceptions.RequestException as e:
-  print(f"Error en la solicitud: {e}")
+    import requests
+except ImportError:
+    requests = None
+    print("aviso: pip install requests")
 
-# 4. Un PUT
-print("\nPUT:")
-try:
-  response = requests.put(
-    "https://jsonplaceholder.typicode.com/posts/1",
-    json={
-      "title": "foo",
-      "body": "bar",
-      "userId": 1,
-    })
+if requests is not None:
+    # .get → Response; .status_code; .json() parsea el body
+    r = requests.get(url, timeout=10)
+    print("status_code:", r.status_code)
+    print("title:", r.json()["title"])
 
-  print(response.status_code)
-except requests.exceptions.RequestException as e:
-  print(f"Error en la solicitud: {e}")
+    # ============================
+    # 🔹 POST (crear recurso de prueba)
+    # ============================
+    print("\n--- POST con requests ---")
+    # json=... manda el body como JSON y pone Content-Type automáticamente
+    try:
+        r = requests.post(
+            "https://jsonplaceholder.typicode.com/posts",
+            json={"title": "foo", "body": "bar", "userId": 1},
+            timeout=10,
+        )
+        print("POST status:", r.status_code)  # suele ser 201
+        print("respuesta id:", r.json().get("id"))
+    except requests.exceptions.RequestException as e:
+        print("Error POST:", e)
 
-# Usar la API de GPT-4o de OpenAI
-# Ref: https://platform.openai.com/docs/api-reference/making-requests
+    # ============================
+    # 🔹 PUT (actualizar)
+    # ============================
+    print("\n--- PUT con requests ---")
+    try:
+        r = requests.put(
+            "https://jsonplaceholder.typicode.com/posts/1",
+            json={"title": "foo", "body": "bar", "userId": 1},
+            timeout=10,
+        )
+        print("PUT status:", r.status_code)
+    except requests.exceptions.RequestException as e:
+        print("Error PUT:", e)
 
-OPENAI_KEY = "sk-XXXXXXXX"
+# ============================
+# 🔹 APIs con API key (solo patrón, NO llamar con claves falsas)
+# ============================
+print("\n--- Patrón para APIs con Bearer token (comentado) ---")
+# Tip: guardá la key en una variable de entorno, no en el código.
+#
+# import os
+# import requests
+#
+# def call_chat_api(api_key: str, prompt: str) -> dict:
+#     url = "https://api.openai.com/v1/chat/completions"  # ejemplo
+#     headers = {
+#         "Content-Type": "application/json",
+#         "Authorization": f"Bearer {api_key}",
+#     }
+#     payload = {
+#         "model": "gpt-4o-mini",
+#         "messages": [{"role": "user", "content": prompt}],
+#     }
+#     r = requests.post(url, headers=headers, json=payload, timeout=30)
+#     r.raise_for_status()
+#     return r.json()
+#
+# key = os.environ.get("OPENAI_API_KEY")
+# if key:
+#     print(call_chat_api(key, "Hola"))
 
-import json
+print("Usá jsonplaceholder para practicar. APIs de pago → solo con env vars.")
 
-def call_openai_gpt(api_key, prompt):
-  url = "https://api.openai.com/v1/chat/completions"
-  headers = {
-    "Content-Type": "application/json",
-    "Authorization": f"Bearer {api_key}"
-  }
-  data = {
-    "model": "gpt-4o-mini",
-    "messages": [{"role": "user", "content": prompt}]
-  }
-
-  response = requests.post(url, json=data, headers=headers)
-  return response.json()
-
-api_response = call_openai_gpt(OPENAI_KEY, "Escribe un breve poema sobre la programación")
-
-# print(json.dumps(api_response, indent=2))
-
-print(api_response["choices"][0]["message"]["content"])
-
-# Llamar a la API de DEEPSEEK
-
-import json
-
-def call_deepseek(api_key, prompt):
-  url = "https://api.deepseek.com/chat/completions"
-  headers = {
-    "Content-Type": "application/json",
-    "Authorization": f"Bearer {api_key}"
-  }
-  data = {
-    "model": "deepseek-chat",
-    "messages": [{"role": "user", "content": prompt}]
-  }
-
-  response = requests.post(url, json=data, headers=headers)
-  print(response.json())
-  return response.json()
-
-api_response = call_deepseek(DEEPSEEK_API_KEY, "Escribe un breve poema sobre la programación")
-
-# print(json.dumps(api_response, indent=2))
-
-print(api_response["choices"][0]["message"]["content"])
+# ============================
+# 🔹 Resumen
+# ============================
+# - urllib: stdlib, más verboso
+# - requests.get/post/put + .json() + timeout
+# - try/except RequestException o URLError
+# - Nunca hardcodear API keys en el código
