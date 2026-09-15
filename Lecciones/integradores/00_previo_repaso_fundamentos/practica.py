@@ -16,10 +16,10 @@
 from __future__ import annotations
 
 import argparse
-import asyncio  # noqa: F401 — disponible para ejercicios 19*
-import json  # noqa: F401 — disponible para ejercicios 15*
-import sys  # noqa: F401 — disponible para ejercicio 18a
-import time  # noqa: F401 — disponible para ejercicios 19*
+import asyncio  # — disponible para ejercicios 19*
+import json
+import sys  #  — disponible para ejercicio 18a
+import time  # — disponible para ejercicios 19*
 from collections.abc import Callable
 from pathlib import Path
 
@@ -46,6 +46,29 @@ def ejercicio(eid: str, titulo: str):
 
 def _header(eid: str, titulo: str) -> None:
     print(f"\n=== [{eid}] {titulo} ===")
+# --- Sistema de registro de ejercicios ---
+#
+# EJERCICIOS: dict[str, Callable[[], None]]
+#   Diccionario global que guarda funciones registradas como ejercicios.
+#   Clave: string (ej. "ej1"), Valor: función ejecutable.
+#
+# def ejercicio(eid: str, titulo: str):
+#   Decorador que registra una función como ejercicio.
+#   - Crea deco(fn) → recibe la función.
+#   - fn._eid / fn._titulo → agrega metadatos a la función.
+#   - EJERCICIOS[eid] = fn → guarda la función en el diccionario.
+#   - return fn → devuelve la función original.
+#   → Se usa como @ejercicio("id", "titulo").
+#
+# def _header(eid: str, titulo: str):
+#   Imprime un encabezado con el ID y título del ejercicio.
+#
+# --- Buenas prácticas ---
+# - Usar decoradores para registrar funciones automáticamente.
+# - Guardar funciones en un diccionario permite ejecutarlas dinámicamente.
+# - Agregar metadatos (eid, titulo) facilita identificación y documentación.
+# - Separar lógica de registro (decorador) de lógica de presentación (_header).
+
 
 
 # ============================
@@ -67,7 +90,46 @@ def ej_01a() -> None:
     # El sep reemplaza el espacio por defecto entre argumentos.
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 01a")
+    # raise NotImplementedError("Completá 01a")
+    nombre = "Juan"
+    edad = 25
+    pais = "Argentina"
+    print(nombre, edad, pais, sep=" | ")
+
+# --- raise NotImplementedError ---
+#
+# raise NotImplementedError("Completá 01a")
+# - Lanza una excepción en tiempo de ejecución.
+# - NotImplementedError → indica que la función/bloque aún no está implementado.
+# - El mensaje "Completá 01a" se muestra en el error.
+#
+# Uso típico:
+# - Marcador de lugar en ejercicios o proyectos.
+# - Obligar a implementar métodos en clases abstractas.
+# - Recordatorio de que falta completar lógica.
+#
+# Ejemplo:
+# def pendiente():
+#     raise NotImplementedError("Falta implementar")
+#
+# pendiente() → detiene el programa con NotImplementedError.
+# --- NotImplementedError ---
+#
+# raise NotImplementedError("Completá 01a")
+# - Lanza una excepción y detiene el programa.
+# - Se usa como marcador de lugar para indicar que falta implementar lógica.
+# - Mientras esté presente, la ejecución se corta con error.
+#
+# Buenas prácticas:
+# - Usarlo solo como placeholder durante el desarrollo.
+# - Al completar la función, eliminar o comentar la línea.
+# - En clases abstractas, se usa para obligar a implementar métodos en subclases.
+#
+# Ejemplo:
+# def pendiente():
+#     raise NotImplementedError("Falta implementar")
+#
+# pendiente() → detiene el programa con NotImplementedError.
 
 
 # ============================
@@ -88,7 +150,26 @@ def ej_02a() -> None:
     # type(x) no convierte; solo INFORMÁ el tipo en runtime.
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 02a")
+    #raise NotImplementedError("Completá 02a")
+    print("Ejercicio 2")
+    texto = 'Cadena de texto'
+    numero = 20
+    decimal = 3.14
+    activo = True
+    lista = [1,2,3,4]
+    tupla = (1,2,3,4)
+    diccionario = {"nombre": "Raul", "Edad": 30}
+    conjunto = {1,2,3,4}
+    print(texto, type(texto))
+    print(numero, type(numero))
+    print(decimal, type(decimal))
+    print(activo, type(activo))
+    print(lista, type(lista))
+    print(tupla, type(tupla))
+    print(diccionario, type(diccionario))
+    print(conjunto, type(conjunto))
+    
+    
 
 
 # ============================
@@ -108,7 +189,9 @@ def ej_03a() -> None:
     # print(list(datos), set(datos))
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 03a")
+    #raise NotImplementedError("Completá 03a")
+    datos = (1,2,3,3)
+    print(list(datos),set(datos))
 
 
 # ============================
@@ -130,7 +213,13 @@ def ej_04a() -> None:
     # // = división entera; % = resto. Se usan juntos para "partir" unidades.
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 04a")
+    #raise NotImplementedError("Completá 04a")
+    total = 3661
+    horas = total // 3600
+    resto = total % 3600
+    minutos = resto // 60
+    segundos = resto % 60
+    print(f"{horas}h {minutos}m {segundos}s")
 
 
 # ============================
@@ -150,7 +239,17 @@ def ej_05a() -> None:
     # len(s)    → cantidad de caracteres
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 05a")
+    #raise NotImplementedError("Completá 05a")
+    texto = "Python es genial"
+    print(texto[:6])
+    print(texto[-6:])
+    print(texto[::-1])
+    print(len(texto))
+    cadena = "Cadena de caracteres"
+    print(cadena[:5])
+    print(cadena[-5:])
+    print(cadena[::-1])
+    print(len(cadena))
 
 
 # ============================
@@ -171,7 +270,12 @@ def ej_06a() -> None:
     #     print("no bisiesto")
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 06a")
+    #raise NotImplementedError("Completá 06a")
+    anio = int(input("Ingrese un año:"))
+    if (anio % 400 ==0) or (anio % 4 == 0 and anio % 100 !=0):
+        print("Es bisiesto")
+    else:
+        print("No es bisiesto")
 
 
 # ============================
@@ -192,7 +296,34 @@ def ej_07a() -> None:
     # print(id(original), id(ref), id(copia_1))  # mismos ids → mismo objeto
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 07a")
+    #raise NotImplementedError("Completá 07a")
+    original = [1,2,3]
+    copia_1 = original[:]
+    copia_2 = original.copy()
+    ref = original
+    ref[0] = 10
+    print(original, copia_1, copia_2, ref)
+# --- Copia vs Referencia en listas ---
+#
+# original = [1,2,3] → lista base.
+#
+# copia_1 = original[:] → copia superficial con slicing.
+# copia_2 = original.copy() → copia superficial con método copy().
+#   Ambas son independientes: cambios en original no las afectan.
+#
+# ref = original → NO crea copia, solo otro nombre para el mismo objeto.
+# ref[0] = 10 → modifica también original porque apuntan al mismo objeto.
+#
+# Resultado:
+# original   → [10, 2, 3] (cambió)
+# copia_1    → [1, 2, 3]  (independiente)
+# copia_2    → [1, 2, 3]  (independiente)
+# ref        → [10, 2, 3] (igual que original)
+#
+# Buenas prácticas:
+# - Usar [:] o .copy() para copias superficiales.
+# - Usar copy.deepcopy() para listas anidadas.
+# - Recordar que asignar ref = original no copia, solo referencia.
 
 
 # ============================
@@ -215,7 +346,38 @@ def ej_08a() -> None:
     # TIP: la condición/índice DEBE avanzar o hay loop infinito.
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 08a")
+    #raise NotImplementedError("Completá 08a")
+
+    # Ejemplo 1: lista fija (simulada)
+    print("--- Ejemplo 1: lista simulada ---")
+    intentos = ["123", "abcdef", "clave1234"]
+    i = 0
+    while i < len(intentos) and len(intentos[i]) < 8:
+        i += 1
+    if i < len(intentos):
+        print("Contraseña válida", intentos[i])
+    else:
+        print("No se encontró una contraseña válida")
+
+    # Ejemplo 2: pedir intentos al usuario
+    print("\n--- Ejemplo 2: input del usuario ---")
+    intentos = [
+        input("Ingresá intento 1: "),
+        input("Ingresá intento 2: "),
+        input("Ingresá intento 3: "),
+    ]
+    i = 0
+    while i < len(intentos) and len(intentos[i]) < 8:
+        i += 1
+    if i < len(intentos):
+        print("Contraseña válida", intentos[i])
+    else:
+        print("No se encontró una contraseña válida")
+
+    # --- Notas ---
+    # while i < len(intentos) and len(intentos[i]) < 8:
+    #   recorre mientras la clave sea corta; i debe avanzar.
+    # if i < len(intentos): encontró una válida; else: ninguna.
 
 
 # ============================
@@ -235,7 +397,13 @@ def ej_09a() -> None:
     # print(mayor)
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 09a")
+    #raise NotImplementedError("Completá 09a")
+    numeros = [15, 5, 25, 10, 20]
+    mayor = numeros[0]
+    for n in numeros[1:]:
+        if n > mayor:
+            mayor = n
+    print(mayor)
 
 
 # ============================
@@ -256,7 +424,11 @@ def ej_10a() -> None:
     # print(sumar_todos(1, 2, 3, 4))
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 10a")
+    #raise NotImplementedError("Completá 10a")
+    def sumar_todos(*args):
+        return sum(args)
+
+    print(sumar_todos(1, 2, 3, 4))
 
 
 # ============================
@@ -275,7 +447,22 @@ def ej_11a() -> None:
     # print(a | b, a & b, a - b)
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 11a")
+    #raise NotImplementedError("Completá 11a")
+    print("Dict - User")
+    user = {
+        "nombre": "Raúl",
+        "edad": 39,
+        "email": "raul@tengo.com"
+    }
+    print(user)
+    user["pais"] = "AR"
+    user["edad"] = 33
+    user.pop("email")
+    print(user)
+    print("Sets - a y b")
+    a = {1,2,3,4}
+    b = {3,4,5,6}
+    print(a | b, a & b, a - b)
 
 
 # ============================
@@ -297,7 +484,21 @@ def ej_12a() -> None:
     #         return f"Soy {self.nombre}, tengo {self.edad} años"
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 12a")
+    #raise NotImplementedError("Completá 12a")
+    class Persona:
+        def __init__(self, nombre, edad):
+            self.nombre = nombre
+            self.edad = edad
+
+        def presentarse(self):
+            return f"Soy {self.nombre}, tengo {self.edad} años"
+
+    persona1 = Persona("Juan", 30)
+    persona2 = Persona("Maria", 25)
+    persona3 = Persona("Julian", 38)
+    print(persona1.presentarse())
+    print(persona2.presentarse())
+    print(persona3.presentarse())
 
 
 # ============================
@@ -323,7 +524,29 @@ def ej_13a() -> None:
     #         raise EdadInvalidaError("edad negativa")
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 13a")
+    #raise NotImplementedError("Completá 13a")
+    print("Validar numero")
+    try:
+        numero = int(input("Ingrese un numero: "))
+        print("Número ingresado:", numero)
+    except ValueError:
+        print("Ingresa un número válido")
+    
+    class EdadInvalidaError(Exception):
+        pass
+    print("Validar edad")
+    def validar_edad(edad):
+        if edad < 0:
+            raise EdadInvalidaError("edad negativa")
+
+    try:
+        edad = int(input("Ingrese su edad: "))
+        validar_edad(edad)
+        print("Edad ingresada:", edad)
+    except EdadInvalidaError as e:
+        print(e)
+    except ValueError:
+        print("Ingresa un número válido")
 
 
 # ============================
@@ -340,7 +563,12 @@ def ej_14a() -> None:
     # [x for x in range(1, 21) if x % 3 == 0]
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 14a")
+    #raise NotImplementedError("Completá 14a")
+    print("Divisibles por 3")
+    numeros = list(filter(lambda x: x % 3 == 0, range(1, 21)))
+    print(numeros)
+    numeros = [x for x in range(1, 21) if x % 3 == 0]
+    print(numeros)
 
 
 @ejercicio("14b", "Decorador @log")
@@ -367,7 +595,23 @@ def ej_14b() -> None:
     #     return wrapper
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 14b")
+    #raise NotImplementedError("Completá 14b")
+    def log(func):
+        def wrapper(*args, **kwargs):
+            print(f"llamando {func.__name__}")
+            return func(*args, **kwargs)
+        return wrapper
+
+    @log
+    def saludar(nombre):
+        print(f"Hola, {nombre}")
+
+    saludar("Juan")
+    saludar("Maria")
+    saludar("Pedro")
+    saludar("Ana")
+    saludar("Luis")
+    saludar("Carlos")
 
 
 @ejercicio("14c", "Decorador @requiere_admin")
@@ -394,8 +638,78 @@ def ej_14c() -> None:
     #     return wrapper
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 14c")
+    #raise NotImplementedError("Completá 14c")
+    def requiere_admin(func):
+        def wrapper(*args, **kwargs):
+            usuario = kwargs.get("usuario", args[0] if args else None)
+            if usuario != "admin":
+                print("Acceso denegado")
+                return
+            return func(*args, **kwargs)
+        return wrapper
 
+    @requiere_admin
+    def panel(usuario):
+        print(f"Bienvenido al panel, {usuario}")
+
+    panel("admin")
+    panel("invitado")
+    usuario = input("Ingrese usuario: ")
+    panel(usuario)
+    # --- Decoradores y wrapper ---
+#
+# ¿Qué es wrapper?
+# - Función interna que "envuelve" a la original.
+# - Recibe los mismos argumentos (*args, **kwargs).
+# - Permite ejecutar lógica antes o después de la función original.
+#
+# ¿Por qué se usa?
+# - Para agregar validaciones, logs, permisos, etc. sin modificar la función.
+# - Separa responsabilidades: la función hace su tarea, el decorador controla acceso.
+# - Es la forma práctica y común de implementar decoradores en Python.
+#
+# Alternativa:
+# - Podrías poner la validación dentro de la función, pero eso mezcla lógica de negocio con control.
+# - Con wrapper, el código queda más limpio y reutilizable.
+#
+# Ejemplo:
+# @requiere_admin
+# def panel(usuario):
+#     print("Bienvenido al panel")
+#
+# panel("admin") → pasa validación.
+# panel("invitado") → bloqueado por wrapper.
+
+
+
+# --- Decorador requiere_admin ---
+#
+# def requiere_admin(func): → define un decorador que recibe una función.
+# def wrapper(*args, **kwargs): → función interna que controla acceso.
+#   usuario = kwargs.get("usuario", args[0] if args else None)
+#     - Busca argumento 'usuario' en kwargs.
+#     - Si no existe, toma el primer argumento posicional.
+#     - Si no hay argumentos, asigna None.
+#   if usuario != "admin": → si no es admin, imprime "Acceso denegado" y termina.
+#   return func(*args, **kwargs) → si es admin, ejecuta la función original.
+# return wrapper → devuelve la función interna como reemplazo.
+#
+# @requiere_admin → aplica el decorador a la función panel.
+# def panel(usuario): → imprime bienvenida si pasa la validación.
+#
+# Ejemplo:
+# panel("admin") → Bienvenido al panel, admin
+# panel("invitado") → Acceso denegado
+#
+# Interactivo:
+# usuario = input("Ingrese usuario: ")
+# panel(usuario)
+#
+# --- Conceptos ---
+# - Decorador: modifica el comportamiento de una función.
+# - wrapper: función interna que decide si ejecutar o no la original.
+# - None: valor por defecto si no se pasa ningún usuario.
+# - Validación: solo usuario == "admin" puede entrar.
 
 @ejercicio("14d", "Decorador @repetir(n)")
 def ej_14d() -> None:
@@ -419,8 +733,20 @@ def ej_14d() -> None:
     #     return decorator
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 14d")
+    #raise NotImplementedError("Completá 14d")
+    def repetir(veces):
+        def decorator(func):
+            def wrapper(*args, **kwargs):
+                for _ in range(veces):
+                    result = func(*args, **kwargs)
+                return result
+            return wrapper
+        return decorator
+    @repetir(3)
+    def decir_hola():
+        print("hola")
 
+    decir_hola()
 
 # ============================
 # 15 — Ficheros / JSON  (+ extra)
@@ -443,7 +769,18 @@ def ej_15a() -> None:
     # TIP: preferí Path(__file__).parent (DIR) para no depender del cwd.
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 15a")
+    #raise NotImplementedError("Completá 15a")
+    ruta = Path(__file__).parent / "notas_repaso.txt"
+    with open(ruta, "w", encoding="utf-8") as f:
+        f.write("linea1\n")
+        f.write("linea2\n")
+        f.write("linea3\n")
+        for i in range(3):
+            texto = input(f"Ingresá línea {i+1}: ")
+            f.write(texto + "\n")
+    with open(ruta, "r", encoding="utf-8") as f:
+        for linea in f:
+            print(linea)
 
 
 @ejercicio("15b", "Dict ↔ JSON")
@@ -460,7 +797,32 @@ def ej_15b() -> None:
     #     print(json.load(f))
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 15b")
+    #raise NotImplementedError("Completá 15b")
+    # Flujo siempre: dict → (string/archivo) → dict.
+    # Nunca uses una variable antes de asignarla (ej. dump(data) sin crear data).
+    # Tip: Cmd+S para que el otro editor vea lo mismo que Cursor.
+
+    ruta = DIR / "perfil_repaso.json"  # archivo junto a este .py (no depende del cwd)
+    data = {  # 1) PRIMERO el dict en memoria (Python)
+        "nombre": "Juan",
+        "edad": 30,
+        "ciudad": "Buenos Aires",
+    }
+    # 2) dumps = dict → str JSON (útil para imprimir / enviar por red)
+    # indent=2 → legible; ensure_ascii=False → conserva tildes (ej. "Buenos Aires")
+    print(json.dumps(data, indent=2, ensure_ascii=False))
+    # 3) dump = dict → archivo .json (persiste en disco)
+    with open(ruta, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+    # 4) load = archivo → dict (volvés a objetos Python)
+    with open(ruta, "r", encoding="utf-8") as f:
+        print(json.load(f))
+
+    # --- Notas rápidas ---
+    # dumps / dump  → serializar (Python → JSON)
+    # loads / load  → deserializar (JSON → Python)
+    # "s" al final  → trabaja con string; sin "s" → trabaja con archivo
+    # open(..., "w") crea/pisa; open(..., "r") solo lee
 
 
 @ejercicio("15c", "Append a archivo")
@@ -479,7 +841,15 @@ def ej_15c() -> None:
     #     f.write("segunda linea\n")
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 15c")
+    #raise NotImplementedError("Completá 15c")
+    ruta = Path(__file__).parent / "bitacora.txt"
+    with open(ruta, "w", encoding="utf-8") as f:
+        f.write("primera linea\n")
+    with open(ruta, "a", encoding="utf-8") as f:
+        f.write("segunda linea\n")
+    with open(ruta, "r", encoding="utf-8") as f:
+        for linea in f:
+            print(linea)
 
 
 # ============================
@@ -497,7 +867,22 @@ def ej_16a() -> None:
     # b es alias (mismo id). copy() crea otro objeto (id distinto).
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 16a")
+    #raise NotImplementedError("Completá 16a")
+    a = [1, 2]
+    b = a
+    a.append(3)
+    print(b)
+    print(id(a), id(b))
+    c = a.copy()
+    c.append(99)
+    print(a)
+    print(id(a), id(b), id(c))
+
+    # --- Notas rápidas ---
+    # - alias: b = a → mismo id.
+    # - copy: c = a.copy() → id distinto.
+    # - append: a.append(3) → cambia a y b.
+    # - id: función para obtener el identificador de un objeto.
 
 
 # ============================
@@ -517,7 +902,13 @@ def ej_17a() -> None:
     #     print("Instalá requests")
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 17a")
+    #raise NotImplementedError("Completá 17a")
+    try:
+        import requests
+    except ImportError:
+        print("Instalá requests")
+    else:
+        print("requests OK", requests.__name__)
 
 
 # ============================
@@ -534,7 +925,11 @@ def ej_18a() -> None:
     # return sys.prefix != getattr(sys, "base_prefix", sys.prefix)
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 18a")
+    #raise NotImplementedError("Completá 18a")
+    def corriendo_en_venv():
+        return sys.prefix != getattr(sys, "base_prefix", sys.prefix)
+    print(corriendo_en_venv())
+    print(sys.executable)
 
 
 # ============================
@@ -559,7 +954,14 @@ def ej_19a() -> None:
     # print(asyncio.run(ping()))
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 19a")
+    #raise NotImplementedError("Completá 19a")
+    async def ping():
+        await asyncio.sleep(0.2)
+        return "pong"
+
+    input("Presioná Enter para hacer ping: ")  # solo pausa; no hace falta guardar el valor
+    print(asyncio.run(ping()))
+
 
 
 @ejercicio("19b", "Secuencial vs gather")
@@ -587,7 +989,45 @@ def ej_19b() -> None:
     # asyncio.run(demo())
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 19b")
+    #raise NotImplementedError("Completá 19b")
+    async def trabajo(nombre, segundos):
+        await asyncio.sleep(segundos)
+        return nombre
+    async def demo():
+        t0 = time.perf_counter()
+        await trabajo("A", 0.3)
+        await trabajo("B", 0.3)
+        print("sec", time.perf_counter() - t0)
+        t0 = time.perf_counter()
+        print(await asyncio.gather(trabajo("A", 0.3), trabajo("B", 0.3)))
+        print("par", time.perf_counter() - t0)
+    asyncio.run(demo())
+# --- Ejercicio 19b: Concurrencia con asyncio ---
+#
+# async def trabajo(nombre, segundos):
+#   - Corutina que espera 'segundos' y devuelve 'nombre'.
+#
+# demo():
+#   - Mide tiempo secuencial:
+#       await trabajo("A", 0.3)
+#       await trabajo("B", 0.3)
+#       → total ≈ 0.6 seg
+#   - Mide tiempo concurrente:
+#       await asyncio.gather(trabajo("A", 0.3), trabajo("B", 0.3))
+#       → total ≈ 0.3 seg
+#       → gather ejecuta ambas tareas en paralelo dentro del event loop.
+#
+# asyncio.run(demo()) → arranca el event loop y corre la corutina principal.
+#
+# Resultado:
+# - Secuencial: suma de tiempos.
+# - Concurrente: máximo de tiempos (más eficiente).
+#
+# Conceptos clave:
+# - async def → define corutina.
+# - await → espera resultado.
+# - asyncio.gather → corre varias corutinas en paralelo.
+# - time.perf_counter() → mide tiempo con precisión.
 
 
 @ejercicio("19c", "5 tareas concurrentes")
@@ -608,7 +1048,15 @@ def ej_19c() -> None:
     # asyncio.run(demo())
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 19c")
+    #raise NotImplementedError("Completá 19c")
+    async def tarea(i):
+        await asyncio.sleep(0.2)
+        return f"T{i}"
+    async def demo():
+        t0 = time.perf_counter()
+        res = await asyncio.gather(*[tarea(i) for i in range(1, 6)])
+        print(res, round(time.perf_counter() - t0, 3))
+    asyncio.run(demo())
 
 
 # ============================
@@ -630,7 +1078,14 @@ def ej_20a() -> None:
     # print(Libro(titulo="Dune", anio=1965).model_dump())
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 20a")
+    #raise NotImplementedError("Completá 20a")
+
+    from pydantic import BaseModel
+    class Libro(BaseModel):
+        titulo: str
+        anio: int
+        leido: bool = False
+    print(Libro(titulo="Dune", anio=1965).model_dump())
 
 
 @ejercicio("20b", "model_validate (coerción)")
@@ -645,7 +1100,15 @@ def ej_20b() -> None:
     # print(type(Libro.model_validate(payload).anio))  # int
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 20b")
+    #raise NotImplementedError("Completá 20b")
+    from pydantic import BaseModel
+    class Libro(BaseModel):
+        titulo: str
+        anio: int
+        leido: bool = False
+    payload = {"titulo": "Dune", "anio": "1965", "leido": False}
+    print(Libro.model_validate(payload))
+    print(type(Libro.model_validate(payload).anio))
 
 
 @ejercicio("20c", "Field + ValidationError")
@@ -667,9 +1130,17 @@ def ej_20c() -> None:
     #     print(e)
 
     # --- TU SOLUCIÓN ---
-    raise NotImplementedError("Completá 20c")
+    #raise NotImplementedError("Completá 20c")
+    from pydantic import BaseModel, Field, ValidationError
+    class Libro(BaseModel):
+        titulo: str
+        anio: int = Field(ge=0)
+    try:
+        Libro(titulo="X", anio=-1)
+    except ValidationError as e:
+        print(e)
 
-
+#==========================
 # ============================
 # CLI — elegir un ejercicio
 # ============================
@@ -680,6 +1151,41 @@ def listar() -> None:
         print(f"  {eid:4}  {fn._titulo}")
     print("\nEjemplo:  python practica.py 14b")
     print("          ./r integradores/00 14b")
+
+
+def _correr_todos() -> int:
+    errores: list[str] = []
+    ordenados = sorted(EJERCICIOS.items(), key=lambda kv: (len(kv[0]), kv[0]))
+    for eid, fn in ordenados:
+        try:
+            fn()
+        except NotImplementedError as e:
+            errores.append(f"{eid}: {e}")
+        except Exception as e:  # noqa: BLE001 — feedback de aprendizaje
+            errores.append(f"{eid}: {type(e).__name__}: {e}")
+    if errores:
+        print("\n--- Pendientes / errores ---")
+        for msg in errores:
+            print("·", msg)
+    return 0
+
+
+def _correr_uno(eid: str) -> int:
+    eid = eid.lower()
+    if eid not in EJERCICIOS:
+        print(f"No existe el ejercicio '{eid}'. Usá --list.\n")
+        listar()
+        return 1
+    try:
+        EJERCICIOS[eid]()
+    except NotImplementedError as e:
+        print(f"\n⏳ Pendiente: {e}")
+        print(
+            "Leé la GUÍA / TIP comentados arriba en la función "
+            "y completá '# --- TU SOLUCIÓN ---'."
+        )
+        return 2
+    return 0
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -695,43 +1201,20 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--all", action="store_true", help="Correr todos (puede fallar en stubs)")
     args = parser.parse_args(argv)
 
-    if args.list or args.ejercicio in (None, "list", "--list"):
-        if args.ejercicio is None and not args.all and not args.list:
-            listar()
-            print("\nPasá un ID para correr solo ese ejercicio.")
-            return 0
-        if args.list or args.ejercicio in ("list", "--list"):
-            listar()
-            return 0
-
-    if args.all:
-        errores = []
-        for eid, fn in sorted(EJERCICIOS.items(), key=lambda kv: (len(kv[0]), kv[0])):
-            try:
-                fn()
-            except NotImplementedError as e:
-                errores.append(f"{eid}: {e}")
-            except Exception as e:  # noqa: BLE001 — feedback de aprendizaje
-                errores.append(f"{eid}: {type(e).__name__}: {e}")
-        if errores:
-            print("\n--- Pendientes / errores ---")
-            for msg in errores:
-                print("·", msg)
+    # Sin args → mostrar menú (no confundir con --all)
+    if args.ejercicio is None and not args.all and not args.list:
+        listar()
+        print("\nPasá un ID para correr solo ese ejercicio.")
         return 0
 
-    eid = args.ejercicio.lower()
-    if eid not in EJERCICIOS:
-        print(f"No existe el ejercicio '{eid}'. Usá --list.\n")
+    if args.list or args.ejercicio in ("list", "--list"):
         listar()
-        return 1
+        return 0
 
-    try:
-        EJERCICIOS[eid]()
-    except NotImplementedError as e:
-        print(f"\n⏳ Pendiente: {e}")
-        print("Leé la GUÍA / TIP comentados arriba en la función y completá '# --- TU SOLUCIÓN ---'.")
-        return 2
-    return 0
+    if args.all:
+        return _correr_todos()
+
+    return _correr_uno(args.ejercicio)
 
 
 if __name__ == "__main__":
