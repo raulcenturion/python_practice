@@ -44,7 +44,9 @@ Hacelo **después** del previo si querés asentar la base en un proyecto chico.
 El `enunciado.md` trae un **checklist por lección**. Todo el flujo es por terminal.
 
 ```bash
-./r integradores/00 presupuesto
+./r integradores/00 presupuesto --list
+./r integradores/00 presupuesto 01
+./r integradores/00 presupuesto app
 ```
 
 ## Integradores de cierre

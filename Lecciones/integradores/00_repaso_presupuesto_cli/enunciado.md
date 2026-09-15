@@ -10,11 +10,28 @@ El usuario interactúa con `input()`; vos aplicás **todo lo visto** en esas lec
 
 ## Cómo correrlo
 
+Misma idea que el previo: **un ejercicio (función) por vez**.
+
 ```bash
-./r integradores/00
+./r integradores/00 presupuesto --list
+./r integradores/00 presupuesto 01          # mostrar_menu
+./r integradores/00 presupuesto 04          # listar_gastos
+./r integradores/00 presupuesto app         # app completa (menú while)
 # o
-python Lecciones/integradores/00_repaso_presupuesto_cli/practica.py
+./r integradores/00_repaso_presupuesto 02
 ```
+
+| ID | Función |
+|----|---------|
+| 01 | `mostrar_menu` |
+| 02 | `pedir_monto` |
+| 03 | `agregar_gasto` |
+| 04 | `listar_gastos` |
+| 05 | `mostrar_total_y_estadisticas` |
+| 06 | `buscar_gastos` |
+| 07 | `eliminar_gasto` |
+| 08 | `toggle_modo_ahorro` |
+| 09 / `app` | app completa (`while` + menú) |
 
 ## Menú (todo por terminal)
 
