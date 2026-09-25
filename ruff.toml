@@ -8,3 +8,10 @@
 "Lecciones/integradores/**/practica.py" = ["PLR1730"]
 # Lección HOF: map/filter/lambda son el objetivo pedagógico
 "Lecciones/fundamentos/14_hof_decoradores/**" = ["PLR1730", "C417", "C419"]
+# FastAPI: Body()/Query()/Path() en el default es el patrón oficial del framework.
+# F401: Body queda importado para los ejercicios aunque a veces no se use.
+"fastApi/blog_api.py" = ["B008", "F401", "E501"]
+"fastapi/blog_api.py" = ["B008", "F401", "E501"]
+# Las prácticas se llaman 00_*.py a propósito. N999 no acepta un nombre que empieza con número.
+"fastApi/00_*.py" = ["N999"]
+"fastapi/00_*.py" = ["N999"]

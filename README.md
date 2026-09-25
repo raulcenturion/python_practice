@@ -97,13 +97,15 @@ Detalle en `Lecciones/integradores/README.md`.
 Carpeta en la raíz: `fastApi/` (venv del repo ya tiene FastAPI + Uvicorn).
 
 ```bash
-# Levantar hola mundo
-source .venv/bin/activate
-uvicorn fastApi.00_hola_fastapi.main:app --reload
-
-# Teoría / práctica
+# Teoría / práctica 00 (archivos en la raíz de fastApi/)
 ./r fastapi/00 teoria
 ./r fastapi/00
+
+# App mínima
+fastapi dev fastApi/00_hola_main.py
+
+# Clase (blog)
+fastapi dev fastApi/blog_api.py
 ```
 
 Docs: http://127.0.0.1:8000/docs — detalle en `fastApi/README.md`.

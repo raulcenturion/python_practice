@@ -1,1 +1,1 @@
-# Para que `uvicorn fastApi.00_hola_fastapi.main:app` importe el paquete.
+# Carpeta del curso. Las prácticas son 00_*.py y la clase es blog_api.py, todo en esta raíz.

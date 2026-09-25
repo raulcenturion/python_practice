@@ -14,6 +14,8 @@
 #   ./r regex/02 teoria          → Lecciones/regex/02_*/teoria.py
 #   ./r scraping/01              → Lecciones/scraping/01_*/practica.py
 #   ./r fechas/01 teoria         → Lecciones/fechas/01_*/teoria.py
+#   ./r fastapi/00               → fastApi/00_*_practica.py
+#   ./r fastapi/00 teoria        → fastApi/00_*_teoria.py
 #   ./r ruta/al/archivo.py       → ese archivo
 
 set -e
@@ -165,11 +167,22 @@ if [[ "$arg1" == logica/* || "$arg1" == regex/* || "$arg1" == scraping/* || "$ar
 
   if [[ "$rest" =~ ^[0-9]{1,2}$ ]]; then
     num=$(printf "%02d" "$((10#$rest))")
-    matches=(Lecciones/"${area}"/"${num}_"*/)
-    # fastApi vive en la raíz, no bajo Lecciones/
+    # fastApi: archivos en la raíz, no en una subcarpeta.
+    #   00_hola_practica.py / 00_hola_teoria.py / 00_hola_main.py
     if [[ "$area" == "fastApi" ]]; then
-      matches=("${area}"/"${num}_"*/)
+      if [[ "$kind" == "teoria" ]]; then
+        file=(fastApi/"${num}"_*_teoria.py)
+      else
+        file=(fastApi/"${num}"_*_practica.py)
+      fi
+      if [[ -f "${file[0]}" ]]; then
+        run_file "${file[0]}" "${extra[@]}"
+      fi
+      echo "No hay ${kind} para fastapi/${num}" >&2
+      ls -1 fastApi/"${num}"_*.py 2>/dev/null >&2 || true
+      exit 1
     fi
+    matches=(Lecciones/"${area}"/"${num}_"*/)
   else
     if [[ "$area" == "fastApi" ]]; then
       matches=("${area}"/*"${rest}"*/)
