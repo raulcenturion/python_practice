@@ -1,1 +1,4 @@
-# Carpeta del curso. Las prácticas son 00_*.py y la clase es blog_api.py, todo en esta raíz.
+# Carpeta del curso.
+# Prácticas: 00_*.py en esta raíz.
+# Clase anterior, en un solo archivo: blog_api.py (queda de histórico).
+# Clase modular: el paquete app/ (se levanta con `fastapi dev app/main.py` desde acá).

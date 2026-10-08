@@ -12,6 +12,10 @@
 # F401: Body queda importado para los ejercicios aunque a veces no se use.
 "fastApi/blog_api.py" = ["B008", "F401", "E501"]
 "fastapi/blog_api.py" = ["B008", "F401", "E501"]
+# La app de la clase usa Query()/Depends() en el default y comentarios largos.
+# main.py importa FastAPI después de load_dotenv(): si no, la URL se lee tarde.
+"fastApi/app/**/*.py" = ["B008", "E501", "E402"]
+"fastapi/app/**/*.py" = ["B008", "E501", "E402"]
 # Las prácticas se llaman 00_*.py a propósito. N999 no acepta un nombre que empieza con número.
 "fastApi/00_*.py" = ["N999"]
 "fastapi/00_*.py" = ["N999"]

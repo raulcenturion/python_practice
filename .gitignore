@@ -1,6 +1,11 @@
 __pycache__/
 *.pyc
 .venv/
+
+# Módulo 6: la URL de la base vive en .env y no se sube.
+# *.db es el archivo SQLite que crea la app en local.
+.env
+*.db
 .vscode/
 *.log
 app.log

@@ -104,8 +104,12 @@ Carpeta en la raíz: `fastApi/` (venv del repo ya tiene FastAPI + Uvicorn).
 # App mínima
 fastapi dev fastApi/00_hola_main.py
 
-# Clase (blog)
+# Clase en un archivo (histórico)
 fastapi dev fastApi/blog_api.py
+
+# Clase modular: hay que entrar a la carpeta, si no esta carpeta tapa al paquete fastapi
+cd fastApi
+fastapi dev app/main.py
 ```
 
 Docs: http://127.0.0.1:8000/docs — detalle en `fastApi/README.md`.
