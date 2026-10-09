@@ -58,6 +58,12 @@ class PostORM(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     title: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
     content: Mapped[str] = mapped_column(Text, nullable=False)
+    # Sección 10. Ruta de la imagen, o NULL si el post no tiene.
+    # La clase escribe image_url = mapped_column(...) sin el tipo Mapped.
+    # Mapped[str | None] es el mismo estilo que el resto de columnas de este archivo.
+    # create_all no agrega columnas a una tabla que ya existe. Si blog.db es viejo,
+    # hay que borrar ese archivo para que esta columna se cree.
+    image_url: Mapped[str | None] = mapped_column(String(300), nullable=True)
     # La clase usa datetime.utcnow (hora UTC sin zona). El equivalente actual
     # es datetime.now(timezone.utc). Se deja utcnow para coincidir con el módulo.
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)

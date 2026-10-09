@@ -127,11 +127,14 @@ class PostRepository:
         content: str,
         author: dict | None,
         tags: list[dict],
+        image_url: str | None = None,
     ) -> PostORM:
         # La clase asigna el autor en el constructor y hace db.add al final.
         # Si el autor ya está en la sesión y el post todavía no, SQLAlchemy avisa
         # "not in session". Por eso el post entra a la sesión antes de colgarle relaciones.
-        post = PostORM(title=title, content=content)
+        # Antes: PostORM(title=title, content=content)
+        # Sección 10: image_url es la ruta /media/... o None si no hubo archivo.
+        post = PostORM(title=title, content=content, image_url=image_url)
         self.db.add(post)
 
         if author:

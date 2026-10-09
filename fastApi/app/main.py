@@ -10,6 +10,10 @@
 # dotenv.load_dotenv       → paquete python-dotenv. Lee el .env de la raíz del repo.
 # app.api.v1.posts.router  → el APIRouter con prefix="/posts".
 # app.api.v1.auth.router   → login y /me. Sección 8.
+# app.api.v1.uploads.router → subir archivos. Sección 10.
+# StaticFiles              → publica una carpeta del disco como URL.
+
+import os
 
 from dotenv import load_dotenv
 
@@ -17,9 +21,15 @@ load_dotenv()
 
 from app.api.v1.auth.router import router as auth_router
 from app.api.v1.posts.router import router as post_router
+from app.api.v1.uploads.router import router as upload_router
 from app.core.db import Base, engine
 
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+
+# Carpeta donde file_storage.py escribe las imágenes.
+# Tiene que existir antes de montarla. exist_ok=True no falla si ya está.
+MEDIA_DIR = "app/media"
 
 
 # create_app deja crear la app en los tests sin ejecutar el archivo como script.
@@ -35,6 +45,14 @@ def create_app() -> FastAPI:
     app.include_router(auth_router, prefix="/api/v1")
     # include_router suma las rutas de posts (/posts, /posts/{id}, ...).
     app.include_router(post_router)
+    # Sección 10. /upload/bytes, /upload/file y /upload/save.
+    # El router ya trae prefix="/upload", por eso acá no se agrega otro.
+    app.include_router(upload_router)
+
+    # Crea app/media y la publica en http://127.0.0.1:8000/media/<archivo>.
+    # No es una ruta de router: StaticFiles lee el archivo del disco y lo devuelve.
+    os.makedirs(MEDIA_DIR, exist_ok=True)
+    app.mount("/media", StaticFiles(directory=MEDIA_DIR), name="media")
 
     return app
 

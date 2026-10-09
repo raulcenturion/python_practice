@@ -25,13 +25,14 @@
 #   from .repository import PostRepository
 #       el router ya no instancia el repositorio. Lo instancia PostService.
 
-from typing import Literal
+from typing import Annotated, Literal
 
 from app.core.db import get_db
 from app.core.security import get_current_user, oauth2_scheme
+from app.services.file_storage import save_uploaded_image
 from sqlalchemy.orm import Session
 
-from fastapi import APIRouter, Depends, Path, Query, status
+from fastapi import APIRouter, Depends, File, Path, Query, UploadFile, status
 
 from .schemas import PaginatedPost, PostCreate, PostPublic, PostSummary, PostUpdate
 from .service import PostService
@@ -40,6 +41,42 @@ from .service import PostService
 # "" queda en /posts. "/{post_id}" queda en /posts/3.
 # tags=["posts"] agrupa estas rutas en la documentación (/docs).
 router = APIRouter(prefix="/posts", tags=["posts"])
+
+
+# --- Sección 9: ejemplo de sync vs async. No está activo. ---
+# La clase lo dejó comentado. Sirve para ver la diferencia, no es parte del blog.
+# Para probarlo hay que descomentar UNA de las dos rutas, reiniciar el servidor
+# y correr fastapi/request_test.py (también comentado).
+#
+# time        → biblioteca estándar. time.sleep(8) frena el hilo 8 segundos.
+# asyncio     → biblioteca estándar. asyncio.sleep(8) es una espera que se puede await.
+# threading   → biblioteca estándar. current_thread().name dice en qué hilo corre.
+#
+# def sync_endpoint + time.sleep:
+#   FastAPI corre las funciones def en un hilo del pool.
+#   Mientras ese hilo duerme, no puede atender otra cosa. Muchos requests juntos
+#   ocupan un hilo cada uno.
+#
+# async def async_endpoint + await asyncio.sleep:
+#   El await suelta el turno. El mismo hilo del event loop atiende otros requests
+#   durante esos 8 segundos. Por eso varios /async juntos tardan ~8 s en total,
+#   no 8 s por cada uno.
+#
+# La clase escribió "theread" y "termino". Son typos de thread y terminó.
+# El script de prueba manda ?t=3, ?t=5.5, etc. Estas rutas no leen t: siempre
+# esperan 8 segundos. El parámetro t del script no cambia la espera.
+#
+# @router.get("/sync")
+# def sync_endpoint():
+#     print("SYNC theread: ", threading.current_thread().name)
+#     time.sleep(8)
+#     return {"message": "Función síncrona termino"}
+#
+# @router.get("/async")
+# async def async_endpoint():
+#     print("ASYNC theread: ", threading.current_thread().name)
+#     await asyncio.sleep(8)
+#     return {"message": "Función asíncrona termino"}
 
 
 # Lista paginada. response_model obliga a la respuesta a tener la forma de PaginatedPost.
@@ -150,7 +187,12 @@ def get_post(
     status_code=status.HTTP_201_CREATED,
 )
 def create_post(
-    post: PostCreate,
+    # Antes el cuerpo era JSON: post: PostCreate.
+    # Sección 10. Depends(as_form) lee title, content y tags del formulario.
+    # Así el mismo request puede traer la imagen. Un JSON ya no arma el post.
+    post: Annotated[PostCreate, Depends(PostCreate.as_form)],
+    # File(None): la imagen es opcional. File(...) la haría obligatoria.
+    image: UploadFile | None = File(None),
     db: Session = Depends(get_db),
     # Sección 8. Sin token válido FastAPI responde 401 y no entra a la función.
     # user es el dict de get_current_user: email y username. El autor ya no viene en el JSON.
@@ -178,7 +220,15 @@ def create_post(
     #     raise HTTPException(status_code=500, detail="Error al crear el post")
     # Antes: return PostService(db).create_post(post)
     # El autor salía del body. Ahora se lo pasamos desde el token.
-    return PostService(db).create_post(post, user)
+    # Sección 10. Si vino una imagen, se guarda antes de crear el post.
+    # La clase hace este guardado en la ruta y después llama al repository.
+    # Acá la URL entra al servicio, que es quien llama al repository.
+    # Si el archivo se guardó y el insert falla, el archivo queda en app/media.
+    saved = None
+    if image is not None:
+        saved = save_uploaded_image(image)
+    image_url = saved["url"] if saved else None
+    return PostService(db).create_post(post, user, image_url)
 
 
 # response_model_exclude_none=True: la respuesta no muestra claves en None.

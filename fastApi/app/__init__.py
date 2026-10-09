@@ -26,6 +26,10 @@
 #       router.py      → POST /login y GET /me. Usuarios de práctica en FAKE_USERS.
 #       schemas.py     → Token, TokenData y UserPublic (el JSON, no la tabla).
 #
+#   api/v1/uploads/router.py → Sección 10. Recibir un archivo (bytes, UploadFile o guardarlo).
+#   services/file_storage.py → Escribe la imagen en app/media y devuelve /media/<nombre>.
+#   main.py monta esa carpeta con StaticFiles para poder abrir la imagen en el navegador.
+#
 #   models/            → Modelos declarativos de SQLAlchemy (tablas y relaciones).
 #       post.py, author.py, tag.py
 #
@@ -88,9 +92,12 @@
 # Las rutas quedarían: router → service → repository → models.
 #
 # Otras piezas de esta carpeta fastapi/, fuera de app/:
-#   00_*.py      prácticas sueltas, no usan esta arquitectura.
-#   blog_api.py  el mismo blog en un solo archivo. Quedó de histórico, antes del corte en capas.
-#   .env         DATABASE_URL. Lo lee core/db.py con python-dotenv. No se sube al repo.
+#   00_*.py         prácticas sueltas, no usan esta arquitectura.
+#   blog_api.py     el mismo blog en un solo archivo. Quedó de histórico, antes del corte en capas.
+#   request_test.py sección 9. Ejemplo comentado: varios GET a la vez para ver
+#                   sync (time.sleep) frente a async (await asyncio.sleep).
+#                   Las rutas /sync y /async están comentadas en posts/router.py.
+#   .env            DATABASE_URL. Lo lee core/db.py con python-dotenv. No se sube al repo.
 #
 # api/v1/ es la versión 1. Otra versión sería api/v2/ con sus propios routers,
 # sin borrar v1. Cada recurso (posts, y más adelante authors o tags) es su propia carpeta

@@ -83,7 +83,7 @@ class PostService:
     # Antes el try/commit/rollback estaba en router.create_post.
     # Se mudó porque guardar o deshacer la transacción es la operación completa.
     # El 201 lo sigue declarando el router, en el decorador de la ruta.
-    def create_post(self, data: PostCreate, author: dict) -> PostPublic:
+    def create_post(self, data: PostCreate, author: dict, image_url: str | None = None) -> PostPublic:
         try:
             # model_dump pasa el modelo Pydantic a un dict, que es lo que espera el repositorio.
             # Antes el autor salía del body:
@@ -94,6 +94,8 @@ class PostService:
                 content=data.content,
                 author=author,
                 tags=[tag.model_dump() for tag in data.tags],
+                # Sección 10. La ruta ya guardó el archivo y manda la URL, o None.
+                image_url=image_url,
             )
             self.db.commit()  # acá se confirma la transacción
             self.db.refresh(post)  # relee la fila por si la base completó columnas

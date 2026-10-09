@@ -6,6 +6,10 @@ __pycache__/
 # *.db es el archivo SQLite que crea la app en local.
 .env
 *.db
+
+# Sección 10: imágenes subidas en local. No van al repo.
+fastapi/app/media/
+fastApi/app/media/
 .vscode/
 *.log
 app.log

@@ -11,10 +11,14 @@
 #   Optional[X]     → X o None. Hoy se escribe X | None y hace lo mismo.
 #   List[X]         → lista de X. Hoy se escribe list[X].
 #   Literal         → el valor solo puede ser uno de esos textos.
+#   Annotated       → junta el tipo con Form(...) en el mismo parámetro.
+# fastapi.Form      → el campo llega como formulario, no como JSON.
 
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+
+from fastapi import Form
 
 
 class Tag(BaseModel):
@@ -46,6 +50,9 @@ class PostBase(BaseModel):
     # = [] compartiría la misma lista entre todos los posts.
     tags: list[Tag] | None = Field(default_factory=list)
     author: Author | None = None
+    # Sección 10. URL pública de la imagen, por ejemplo /media/abc.png.
+    # None si el post se creó sin archivo. La clase lo escribe Optional[str].
+    image_url: str | None = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -79,6 +86,20 @@ class PostCreate(BaseModel):
         if "spam" in value.lower():
             raise ValueError("El título no puede contener la palabra: 'spam'")
         return value
+
+    # Arma el PostCreate desde campos de formulario, no desde un JSON.
+    # El POST del post ahora es multipart: así puede viajar la imagen al lado.
+    # Form(min_length=3) valida el texto igual que Field, pero en el form.
+    # tags llega como textos sueltos ("python", "fastapi") y acá se vuelven Tag.
+    @classmethod
+    def as_form(
+        cls,
+        title: Annotated[str, Form(min_length=3)],
+        content: Annotated[str, Form(min_length=10)],
+        tags: Annotated[list[str] | None, Form()] = None,
+    ):
+        tag_objs = [Tag(name=tag) for tag in (tags or [])]
+        return cls(title=title, content=content, tags=tag_objs)
 
 
 # Body del PUT. Los dos campos son opcionales: se puede mandar solo uno.
