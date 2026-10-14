@@ -105,14 +105,21 @@ class PostRepository:
 
         return author_obj
 
-    # Igual que el autor, pero el tag se busca sin importar mayúsculas (ilike).
+    # Igual que el autor: si el nombre ya existe, devuelve esa fila.
+    # Antes: TagORM.name.ilike(name). ilike es "parecido", no "igual".
+    # Sección 11 compara el nombre ya pasado a minúsculas.
     def ensure_tag(self, name: str) -> TagORM:
-        tag_obj = self.db.execute(select(TagORM).where(TagORM.name.ilike(name))).scalar_one_or_none()
+        normalize = name.strip().lower()
+        tag_obj = self.db.execute(
+            select(TagORM).where(func.lower(TagORM.name) == normalize)
+        ).scalar_one_or_none()
 
         if tag_obj:
             return tag_obj
 
-        tag_obj = TagORM(name=name)
+        # Se guarda en minúsculas, igual que TagRepository.create_tag.
+        # Así "Python" escrito en un post y "python" creado en /tags son la misma fila.
+        tag_obj = TagORM(name=normalize)
         self.db.add(tag_obj)
         self.db.flush()
         return tag_obj
@@ -144,9 +151,22 @@ class PostRepository:
             # en la columna name de authors.
             post.author = self.ensure_author(author["username"], author["email"])
 
+        # Sección 11. La clase toma solo el primer tag y parte el nombre por comas:
+        # names = tags[0]["name"].split(",")
+        # for name in names:
+        #     name = name.strip().lower()
+        #     if not name:
+        #         continue
+        #     post.tags.append(self.ensure_tag(name))
+        # El formulario puede mandar una etiqueta ("python,fastapi") o varias
+        # ("python" y "fastapi"). Se recorre cada una y, además, se parte por comas.
+        # ensure_tag vuelve a pasar a minúsculas. Acá también, para el comentario de la clase.
         for tag in tags:
-            tag_obj = self.ensure_tag(tag["name"])
-            post.tags.append(tag_obj)
+            for name in tag["name"].split(","):
+                name = name.strip().lower()
+                if not name:
+                    continue
+                post.tags.append(self.ensure_tag(name))
 
         # flush escribe el INSERT. refresh relee id y created_at que puso la base.
         self.db.flush()

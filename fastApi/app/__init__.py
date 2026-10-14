@@ -20,18 +20,29 @@
 #       repository.py  → Encapsula consultas y operaciones en la base de datos.
 #
 #   core/db.py         → Configuración de la conexión a la base de datos (engine, sesión).
-#   core/security.py   → Sección 8. Firma el JWT, lo verifica y devuelve el usuario actual.
+#   core/config.py     → Sección 11. Clave, algoritmo y minutos del JWT.
+#   core/security.py   → Sección 8. Firma el JWT y devuelve el usuario del token.
+#                        Sección 11 suma hash_password, verify_password y require_role.
 #
 #   api/v1/auth/
 #       router.py      → POST /login y GET /me. Usuarios de práctica en FAKE_USERS.
-#       schemas.py     → Token, TokenData y UserPublic (el JSON, no la tabla).
+#       schemas.py     → Token y UserPublic (el login actual). UserRecord, UserCreate,
+#                        UserLogin, TokenResponse y RoleUpdate son el JSON de la tabla users.
+#
+#   api/v1/tags/       → Sección 11. CRUD de etiquetas.
+#       router.py      → /tags. La clase llama al repository y hace commit en la ruta.
+#       service.py     → Ese commit y el 404/500 viven acá, igual que en posts.
+#       repository.py  → SQL de tags. list, create, update, delete, el más usado.
+#       schemas.py     → TagPublic, TagCreate, TagUpdate, TagWithCount.
+#
+#   services/pagination.py → Corta un SELECT en páginas. Lo usa el listado de tags.
 #
 #   api/v1/uploads/router.py → Sección 10. Recibir un archivo (bytes, UploadFile o guardarlo).
 #   services/file_storage.py → Escribe la imagen en app/media y devuelve /media/<nombre>.
 #   main.py monta esa carpeta con StaticFiles para poder abrir la imagen en el navegador.
 #
 #   models/            → Modelos declarativos de SQLAlchemy (tablas y relaciones).
-#       post.py, author.py, tag.py
+#       post.py, author.py, tag.py, user.py (tabla users, sección 11; el login aún no la usa)
 #
 #   main.py            → Punto de entrada de la aplicación, monta los routers.
 #
@@ -100,5 +111,5 @@
 #   .env            DATABASE_URL. Lo lee core/db.py con python-dotenv. No se sube al repo.
 #
 # api/v1/ es la versión 1. Otra versión sería api/v2/ con sus propios routers,
-# sin borrar v1. Cada recurso (posts, y más adelante authors o tags) es su propia carpeta
+# sin borrar v1. Cada recurso (posts, tags) es su propia carpeta
 # con router, service, schemas y repository.

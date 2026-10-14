@@ -11,6 +11,7 @@
 # app.api.v1.posts.router  → el APIRouter con prefix="/posts".
 # app.api.v1.auth.router   → login y /me. Sección 8.
 # app.api.v1.uploads.router → subir archivos. Sección 10.
+# app.api.v1.tags.router    → CRUD de etiquetas. Sección 11.
 # StaticFiles              → publica una carpeta del disco como URL.
 
 import os
@@ -21,6 +22,7 @@ load_dotenv()
 
 from app.api.v1.auth.router import router as auth_router
 from app.api.v1.posts.router import router as post_router
+from app.api.v1.tags.router import router as tag_router
 from app.api.v1.uploads.router import router as upload_router
 from app.core.db import Base, engine
 
@@ -45,6 +47,9 @@ def create_app() -> FastAPI:
     app.include_router(auth_router, prefix="/api/v1")
     # include_router suma las rutas de posts (/posts, /posts/{id}, ...).
     app.include_router(post_router)
+    # Sección 11. El router ya trae prefix="/tags". Queda /tags, sin /api/v1,
+    # igual que /posts. La clase lo incluye en el mismo lugar.
+    app.include_router(tag_router)
     # Sección 10. /upload/bytes, /upload/file y /upload/save.
     # El router ya trae prefix="/upload", por eso acá no se agrega otro.
     app.include_router(upload_router)

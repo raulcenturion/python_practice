@@ -8,6 +8,9 @@
 from .author import AuthorORM
 from .post import PostORM, post_tags
 from .tag import TagORM
+from .user import User
 
 # __all__ dice qué nombres son públicos si alguien hace: from app.models import *
-__all__ = ["AuthorORM", "PostORM", "TagORM", "post_tags"]
+# User entra en la sección 11. Importarlo acá registra la tabla users en Base.
+# create_all la crea porque el repository de posts ya importa este paquete.
+__all__ = ["AuthorORM", "PostORM", "TagORM", "User", "post_tags"]
