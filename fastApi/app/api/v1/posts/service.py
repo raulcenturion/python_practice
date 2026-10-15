@@ -83,12 +83,15 @@ class PostService:
     # Antes el try/commit/rollback estaba en router.create_post.
     # Se mudó porque guardar o deshacer la transacción es la operación completa.
     # El 201 lo sigue declarando el router, en el decorador de la ruta.
-    def create_post(self, data: PostCreate, author: dict, image_url: str | None = None) -> PostPublic:
+    # Sección 8: author: dict, con email y username sacados del token.
+    # Sección 12: author es la fila User. El repositorio lee full_name y email.
+    def create_post(self, data: PostCreate, author, image_url: str | None = None) -> PostPublic:
         try:
             # model_dump pasa el modelo Pydantic a un dict, que es lo que espera el repositorio.
             # Antes el autor salía del body:
             # author=(data.author.model_dump() if data.author else None),
-            # Sección 8: author es el usuario del token ({email, username}).
+            # Sección 8: author era el dict del token ({email, username}).
+            # Sección 12: es la fila User que devolvió get_current_user.
             post = self.repository.create_post(
                 title=data.title,
                 content=data.content,

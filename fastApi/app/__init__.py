@@ -21,13 +21,16 @@
 #
 #   core/db.py         → Configuración de la conexión a la base de datos (engine, sesión).
 #   core/config.py     → Sección 11. Clave, algoritmo y minutos del JWT.
-#   core/security.py   → Sección 8. Firma el JWT y devuelve el usuario del token.
-#                        Sección 11 suma hash_password, verify_password y require_role.
+#   core/security.py   → Firma el JWT. Sección 12: get_current_user lee la fila users
+#                        (el sub del token es el id). hash_password, verify_password,
+#                        require_user, require_editor y require_admin.
 #
 #   api/v1/auth/
-#       router.py      → POST /login y GET /me. Usuarios de práctica en FAKE_USERS.
-#       schemas.py     → Token y UserPublic (el login actual). UserRecord, UserCreate,
-#                        UserLogin, TokenResponse y RoleUpdate son el JSON de la tabla users.
+#       router.py      → /register, /login (JSON), /token (formulario de Swagger),
+#                        /me y PUT /role/{id}. FAKE_USERS quedó comentado.
+#       service.py     → Alta, login, token y cambio de rol. El commit vive acá.
+#       repository.py  → SQL de users: por id, por email, alta, set_role.
+#       schemas.py     → UserPublic, UserCreate, UserLogin, TokenResponse, RoleUpdate.
 #
 #   api/v1/tags/       → Sección 11. CRUD de etiquetas.
 #       router.py      → /tags. La clase llama al repository y hace commit en la ruta.
@@ -42,7 +45,7 @@
 #   main.py monta esa carpeta con StaticFiles para poder abrir la imagen en el navegador.
 #
 #   models/            → Modelos declarativos de SQLAlchemy (tablas y relaciones).
-#       post.py, author.py, tag.py, user.py (tabla users, sección 11; el login aún no la usa)
+#       post.py, author.py, tag.py, user.py (tabla users; el login de la sección 12 la usa)
 #
 #   main.py            → Punto de entrada de la aplicación, monta los routers.
 #
@@ -70,7 +73,8 @@
 #      abrir y cerrar la sesión es parte del request.
 #   4. Antes de la función, Depends(get_current_user) lee el header Authorization.
 #      Sin token, o con un token vencido o mal firmado, responde 401 y no sigue.
-#      El router llama a PostService(db).create_post(post, user). El user sale del token.
+#      Sección 12: el sub del token es el id, y esta dependencia devuelve la fila User.
+#      El router llama a PostService(db).create_post(post, user). El autor sale de esa fila.
 #   5. El servicio le pide el INSERT a PostRepository. El repository usa
 #      PostORM, AuthorORM y TagORM (models/). No hace commit.
 #   6. El servicio hace commit. Si el título ya existe, la base lanza IntegrityError,
@@ -87,7 +91,8 @@
 #   service → repository, schemas
 #   repository → models
 #   models → core.db (solo la clase Base)
-#   core no importa routers ni models de negocio
+#   core/security.py importa User: get_current_user devuelve esa fila.
+#   No importa routers. auth2_token llama a AuthService adentro de la función.
 #   schemas no importa la base: un schema no sabe si atrás hay SQLite o Postgres
 #
 # El servicio ya está: app/api/v1/posts/service.py.

@@ -48,13 +48,55 @@ fastapi dev app/main.py
 
 Rutas: http://127.0.0.1:8000/posts — docs: http://127.0.0.1:8000/docs
 
-Sección 8, con el servidor levantado:
+Sección 12, con el servidor levantado. El usuario se crea en la tabla `users`.
+El rol inicial es `user`. Cambiar roles (`PUT /api/v1/auth/role/{id}`) pide un admin.
 
 ```bash
-# Login (formulario, no JSON). Usuarios de práctica en app/api/v1/auth/router.py
+# Alta. JSON, no formulario.
+curl -X POST http://127.0.0.1:8000/api/v1/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"ricardo@example.com","password":"secret123","full_name":"Ricardo"}'
+
+# Login. Devuelve access_token y el usuario.
 curl -X POST http://127.0.0.1:8000/api/v1/auth/login \
-  -d "username=ricardo@example.com&password=secret123"
+  -H "Content-Type: application/json" \
+  -d '{"email":"ricardo@example.com","password":"secret123"}'
 ```
 
+El botón Authorize de `/docs` no usa ese JSON: manda el formulario a
+`POST /api/v1/auth/token`. En el campo username va el email.
+
 Crear, editar y borrar un post pide el header `Authorization: Bearer <access_token>`.
-Listar y leer siguen abiertos. El mapa está en `app/__init__.py`.
+Listar y leer posts siguen abiertos. Crear o editar un tag pide rol editor.
+Borrar un tag pide admin. El mapa está en `app/__init__.py`.
+
+## Paquetes que hay que instalar
+
+La lista completa, con versiones, está en `requirements.txt` de la raíz del repo.
+Estos los pide la clase y no vienen con Python:
+
+| Paquete | Para qué | Sección |
+|---------|----------|---------|
+| `fastapi` | La aplicación y las rutas | base |
+| `python-dotenv` | Lee el `.env` (`DATABASE_URL`, `SECRET_KEY`) | 6 |
+| `sqlalchemy` | Tablas y consultas | 6 |
+| `PyJWT` | Firma y verifica el token. El import es `jwt` | 8 |
+| `python-multipart` | Formularios y archivos (`UploadFile`, login) | 8 y 10 |
+| `email-validator` | `EmailStr` en los schemas | 6 |
+| `pwdlib[argon2]` | Hashea la clave. `PasswordHash` en `app/core/security.py` | 11 |
+| `passlib` | Otra librería para hashear claves (`CryptContext`). No es `pwdlib` | 11 |
+
+`pwdlib` y `passlib` son dos paquetes distintos. El código de la clase importa
+`pwdlib`. `passlib` queda instalado para tenerlo en el proyecto.
+
+`pwdlib` solo no alcanza: `PasswordHash.recommended()` usa Argon2, y ese algoritmo
+viene en el extra `[argon2]` (`argon2-cffi`). La clase escribe `pip install pwdlib`.
+En este proyecto el comando es el de abajo.
+
+Con el venv del repo activo, desde la raíz:
+
+```bash
+source .venv/bin/activate
+pip install "pwdlib[argon2]"
+pip install passlib
+```

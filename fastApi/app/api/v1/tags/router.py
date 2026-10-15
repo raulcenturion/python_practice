@@ -1,22 +1,25 @@
 # Rutas de etiquetas. Sección 11.
 # GET    /tags              lista, con página, orden y búsqueda. Sin token.
-# POST   /tags              crea. Pide token.
-# PUT    /tags/{tag_id}     renombra. Pide token.
-# DELETE /tags/{tag_id}    borra. Pide token.
-# GET    /tags/popular/top  el tag usado en más posts. Pide token.
+# POST   /tags              crea. Sección 12: hace falta rol editor (o admin).
+# PUT    /tags/{tag_id}     renombra. Editor o admin.
+# DELETE /tags/{tag_id}    borra. Solo admin.
+# GET    /tags/popular/top  el tag usado en más posts. Cualquier usuario logueado.
 #
 # La clase llama al repository desde acá y hace db.commit() en la ruta.
 # Ese commit se mudó a service.py, igual que en posts. Abajo queda comentado
 # cómo lo escribía la clase.
 #
 # fastapi.APIRouter     → el grupo de rutas. prefix="/tags" arma la URL.
-# fastapi.Depends        → abre la sesión (get_db) y exige el token (get_current_user).
+# fastapi.Depends        → abre la sesión (get_db) y exige el rol (require_editor, ...).
 # fastapi.HTTPException  → la clase lo lanza en la ruta. Ahora lo lanza el servicio.
 # fastapi.Query          → lee ?page= &per_page= &order_by= &direction= &search=
 # fastapi.status         → 201 y 204 con nombre, en vez del número suelto.
 # sqlalchemy.orm.Session → el tipo de la sesión. La abre core/db.py.
-# get_current_user       → sección 8. Hoy devuelve el dict del token, no la fila User.
-#   Alcanza para saber que hay sesión. El rol (require_editor) todavía no se usa.
+# app.models.user.User   → la fila que devuelve require_*. El prefijo _ dice que
+#   la ruta no lee esa variable: solo necesita que la dependencia deje pasar.
+# Sección 11 estas rutas usaban Depends(get_current_user): alcanzaba con estar logueado.
+# La sección 12 cambia cuál rol mínimo pide cada una. get_current_user sigue
+# adentro de require_role.
 #
 # La clase importa `from operator import ge` y `from app.api.v1.tags import repository`.
 # operator.ge es "mayor o igual" de Python. El ge=1 de Query es un argumento de FastAPI,
@@ -24,7 +27,8 @@
 # Esos dos imports no van.
 
 from app.core.db import get_db
-from app.core.security import get_current_user
+from app.core.security import require_admin, require_editor, require_user
+from app.models.user import User
 from sqlalchemy.orm import Session
 
 from fastapi import APIRouter, Depends, Query, status
@@ -70,10 +74,11 @@ def list_tags(
 def create_tag(
     tag: TagCreate,
     db: Session = Depends(get_db),
-    user=Depends(get_current_user),
+    # Sección 11: user=Depends(get_current_user)
+    # Sección 12: editor o admin. Un user recibe 403.
+    _editor: User = Depends(require_editor),
 ):
-    # user no se lee. Depends(get_current_user) está para rechazar la petición
-    # si no hay token. La clase hace lo mismo.
+    # _editor no se lee. La dependencia frena a quien no llega a editor.
     # La clase, adentro de la ruta:
     # repository = TagRepository(db)
     # try:
@@ -92,7 +97,8 @@ def update_tag(
     tag_id: int,
     payload: TagUpdate,
     db: Session = Depends(get_db),
-    user=Depends(get_current_user),
+    # Sección 11: user=Depends(get_current_user)
+    _editor: User = Depends(require_editor),
 ):
     # La clase:
     # tag = TagRepository(db).update(tag_id, name=payload.name)
@@ -106,7 +112,9 @@ def update_tag(
 def delete_tag(
     tag_id: int,
     db: Session = Depends(get_db),
-    user=Depends(get_current_user),
+    # Sección 11: user=Depends(get_current_user)
+    # Sección 12: borrar un tag pide admin. Editor recibe 403.
+    _admin: User = Depends(require_admin),
 ):
     # 204 no lleva cuerpo. Por eso la función no devuelve el tag.
     # La clase devuelve None después del commit. El servicio hace el commit
@@ -125,7 +133,10 @@ def delete_tag(
 @router.get("/popular/top", response_model=TagWithCount)
 def get_most_popular_tag(
     db: Session = Depends(get_db),
-    user=Depends(get_current_user),
+    # Sección 11: user=Depends(get_current_user)
+    # Sección 12: require_user. Es el rol más bajo: cualquiera logueado y activo entra.
+    # Sigue rechazando si no hay token.
+    _user: User = Depends(require_user),
 ):
     # La clase no pone response_model y devuelve el dict de most_popular().
     # TagWithCount ya estaba en schemas.py y describe id, name y uses.

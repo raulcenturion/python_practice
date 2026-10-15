@@ -1,7 +1,8 @@
-# JSON del login y del usuario autenticado.
-# Hasta la sección 8 los usuarios viven en FAKE_USERS (router.py), no en la base.
-# La sección 11 suma los modelos de la tabla users. /login y /me siguen con
-# Token y UserPublic. UserRecord y el resto quedan para cuando el login lea esa tabla.
+# JSON del login y del usuario.
+# Sección 8: Token (solo el access_token) y UserPublic con email y username.
+#   Eso era el dict de FAKE_USERS. Quedó comentado abajo.
+# Sección 11 y 12: UserPublic es la fila de users (id, email, nombre, rol, activo).
+#   /login devuelve TokenResponse: el token más ese usuario.
 #
 # typing.Literal      → el rol solo puede ser user, editor o admin.
 # pydantic.BaseModel  → la forma del JSON.
@@ -15,36 +16,15 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
-
-# Lo que devuelve POST /api/v1/auth/login.
-# token_type "bearer" le dice al cliente que lo mande como: Bearer <access_token>.
-class Token(BaseModel):
-    access_token: str
-    token_type: str = "bearer"
-
-
-# Lo que va dentro del token, después de decodificarlo.
-# sub es el email. username es el nombre corto. Esta clase documenta esa forma;
-# get_current_user hoy devuelve un dict con las mismas claves.
-class TokenData(BaseModel):
-    sub: str
-    username: str
-
-
-# Lo que devuelve GET /api/v1/auth/me. Sin la clave.
-class UserPublic(BaseModel):
-    email: str
-    username: str
-    model_config = ConfigDict(from_attributes=True)
-
-
-# --- Sección 11. Modelos de la tabla users. /login y /me no los usan todavía. ---
+# --- Sección 8. Respuesta del login contra FAKE_USERS. Ya no la devuelve ninguna ruta. ---
+# class Token(BaseModel):
+#     access_token: str
+#     token_type: str = "bearer"
 #
-# La clase reemplaza UserPublic por uno con id, role e is_active, y renombra
-# Token a TokenResponse (el token más el usuario). Eso rompe GET /me, que sigue
-# devolviendo email y username del token de FAKE_USERS.
-# Por eso UserPublic y Token de arriba se quedan. Los de abajo son los de la clase,
-# con el nombre UserRecord donde la clase dice UserPublic.
+# class UserPublic(BaseModel):
+#     email: str
+#     username: str
+#     model_config = ConfigDict(from_attributes=True)
 
 Role = Literal["user", "editor", "admin"]
 
@@ -56,34 +36,44 @@ class UserBase(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-# En la clase esta clase se llama UserPublic.
-class UserRecord(UserBase):
+# Lo que devuelve /register, /me y el cambio de rol. Sin la clave.
+# En la integración de la sección 11 se llamó UserRecord, para no pisar el
+# UserPublic de email y username. La clase lo llama UserPublic. Ahora ese es el nombre activo.
+class UserPublic(UserBase):
     id: int
     role: Role
     is_active: bool
 
 
-# Body para dar de alta un usuario. La sección 11 no trae la ruta que lo use.
+# Body del POST /register. La ruta llega en la sección 12.
 class UserCreate(BaseModel):
     email: EmailStr
     password: str = Field(min_length=6, max_length=72)
     full_name: str | None = None
 
 
-# Body JSON de un login. El login actual no lo usa: lee OAuth2PasswordRequestForm
-# (usuario y clave como formulario, no como este JSON).
+# Body JSON de POST /login. /token no usa esta clase: Swagger manda un formulario.
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
 
-# Lo que la clase quiere devolver en el login: el token y el usuario de la tabla.
+# Lo que devuelve POST /login: el token y la fila, sin la clave.
+# token_type "bearer" le dice al cliente que lo mande como: Bearer <access_token>.
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
-    user: UserRecord
+    user: UserPublic
 
 
-# Body para cambiar el rol. La ruta que lo aplique llega con los roles (sección 12).
+# Body del PUT /role/{id}. role solo puede ser user, editor o admin.
 class RoleUpdate(BaseModel):
     role: Role
+
+
+# Lo que la sección 8 guardaba dentro del token: el email en sub y el username.
+# La sección 12 guarda solo sub, y ese sub es el id de users, no el email.
+# username ya no viaja. Se deja en el modelo porque la clase no lo sacó de TokenData.
+class TokenData(BaseModel):
+    sub: str
+    username: str

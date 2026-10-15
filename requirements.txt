@@ -22,7 +22,14 @@ playwright==1.55.0
 pydantic==2.13.4
 pydantic_core==2.46.4
 PyJWT==2.15.1
+# Sección 11. pip install "pwdlib[argon2]"
+# pwdlib hashea la clave (PasswordHash en fastapi/app/core/security.py).
+# argon2-cffi, argon2-cffi-bindings, cffi y pycparser los trae el extra [argon2].
 pwdlib==0.3.1
+# Sección 11. pip install passlib
+# Otra librería de hashes (passlib.context.CryptContext). No reemplaza a pwdlib:
+# security.py importa pwdlib. Queda instalado para tenerlo en el proyecto.
+passlib==1.7.4
 argon2-cffi==25.1.0
 argon2-cffi-bindings==26.1.0
 cffi==2.1.1

@@ -132,7 +132,9 @@ class PostRepository:
         self,
         title: str,
         content: str,
-        author: dict | None,
+        # Sección 8: author era dict | None ({username, email}).
+        # Sección 12: es la fila User, o None si no hay autor.
+        author,
         tags: list[dict],
         image_url: str | None = None,
     ) -> PostORM:
@@ -147,9 +149,13 @@ class PostRepository:
         if author:
             # Antes: ensure_author(author["name"], author["email"])
             # El body traía Author, con name y email.
-            # Sección 8: el token trae username, no name. Esa cadena se guarda
-            # en la columna name de authors.
-            post.author = self.ensure_author(author["username"], author["email"])
+            # Sección 8: el token era un dict. username se guardaba en authors.name.
+            # post.author = self.ensure_author(author["username"], author["email"])
+            # Sección 12: get_current_user devuelve la fila User. No tiene username.
+            # El nombre es full_name. Si el registro no lo mandó, se usa el email
+            # para no dejar la columna vacía.
+            name = author.full_name or author.email
+            post.author = self.ensure_author(name, author.email)
 
         # Sección 11. La clase toma solo el primer tag y parte el nombre por comas:
         # names = tags[0]["name"].split(",")

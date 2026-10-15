@@ -1,6 +1,6 @@
-# Tabla users. Sección 11. Todavía nadie se loguea contra esta tabla:
-# el login sigue leyendo FAKE_USERS en api/v1/auth/router.py.
-# La fila queda definida para hashear claves y, más adelante, roles.
+# Tabla users. Sección 11 define la fila. Sección 12: el login la lee.
+# FAKE_USERS quedó comentado en api/v1/auth/router.py.
+# hashed_password lo llena hash_password (pwdlib). El rol arranca en "user".
 #
 # datetime              → biblioteca estándar. La fecha de alta.
 # typing.Literal        → limita role a tres textos. No es una tabla.

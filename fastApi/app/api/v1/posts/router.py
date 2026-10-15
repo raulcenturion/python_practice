@@ -195,7 +195,8 @@ def create_post(
     image: UploadFile | None = File(None),
     db: Session = Depends(get_db),
     # Sección 8. Sin token válido FastAPI responde 401 y no entra a la función.
-    # user es el dict de get_current_user: email y username. El autor ya no viene en el JSON.
+    # Antes user era el dict {email, username}.
+    # Sección 12: es la fila User (id, email, full_name, role). El autor sigue sin venir en el JSON.
     user=Depends(get_current_user),
 ):
     # --- Antes el router hacía el insert, el commit y traducía los errores. ---

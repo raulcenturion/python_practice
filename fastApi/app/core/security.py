@@ -14,25 +14,39 @@
 # fastapi.Depends            → engancha get_current_user en una ruta.
 # fastapi.HTTPException      → 401 si no hay sesión válida, 403 si no alcanza el permiso.
 # fastapi.security.OAuth2PasswordBearer
-#   → saca el token del header. tokenUrl es la ruta de login que muestra Swagger
-#     en el botón Authorize. Tiene que coincidir con la URL real: /api/v1/auth/login.
+#   → saca el token del header. tokenUrl es la ruta que muestra Swagger
+#     en el botón Authorize. Sección 12: /api/v1/auth/token (formulario).
+#     Antes era /api/v1/auth/login. /login ahora recibe JSON, y Swagger
+#     no manda JSON en ese botón: manda usuario y clave como formulario.
+# fastapi.security.OAuth2PasswordRequestForm
+#   → ese formulario. Lo lee auth2_token. El campo se llama username.
+# sqlalchemy.orm.Session     → la sesión. La clase importa Session desde sqlmodel.
+#   Este proyecto no usa SQLModel. La sesión es la de SQLAlchemy, la misma de get_db.
+# app.core.db.get_db         → abre esa sesión por request.
+# app.models.user.User       → la fila que devuelve get_current_user.
 # app.core.config.settings   → sección 11. La clave, el algoritmo y los minutos.
 # typing.Literal             → los tres roles de require_role.
 #
 # La clase importa además:
 #   from click import pass_context   click es de terminales. pass_context no se usa.
-#   from sqlmodel import Session     este proyecto usa SQLAlchemy, no SQLModel.
-#   from app.models.user import User lo usaría el get_current_user nuevo, comentado abajo.
 # os.getenv se mudó a config.py. Acá ya no hace falta importar os.
+#
+# La clase también importa UserRepository al inicio de este archivo, para /token.
+# Eso hace que core importe una capa de api. auth2_token llama al servicio
+# adentro de la función, cuando el módulo ya terminó de cargarse, para no
+# armar un círculo: service.py importa create_access_token desde acá.
 
 from datetime import datetime, timedelta, timezone
 from typing import Literal
 
 import jwt
 from app.core.config import settings
-from fastapi.security import OAuth2PasswordBearer
-from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
+from app.core.db import get_db
+from app.models.user import User
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from jwt.exceptions import ExpiredSignatureError, InvalidTokenError, PyJWTError
 from pwdlib import PasswordHash
+from sqlalchemy.orm import Session
 
 from fastapi import Depends, HTTPException, status
 
@@ -40,20 +54,21 @@ from fastapi import Depends, HTTPException, status
 # SECRET_KEY = os.getenv("SECRET_KEY", "change-me-in-prod")
 # ALGORITHM = "HS256"
 # ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
-# Sección 11 las centraliza en core/config.py. Los nombres de acá siguen,
-# para no tocar create_access_token ni el login de la sección 8.
-SECRET_KEY = settings.JWT_SECRET
-ALGORITHM = settings.JWT_ALG
-ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
+# Sección 11 las centraliza en core/config.py. Estas tres líneas las usaba
+# create_access_token de la sección 8. La sección 12 firma con settings.JWT_SECRET.
+# SECRET_KEY = settings.JWT_SECRET
+# ALGORITHM = settings.JWT_ALG
+# ACCESS_TOKEN_EXPIRE_MINUTES = settings.ACCESS_TOKEN_EXPIRE_MINUTES
 
-# Argon2. hash() devuelve un string que se guardaría en users.hashed_password.
+# Argon2. hash() devuelve el string que se guarda en users.hashed_password.
 # verify() compara el texto que escribió la persona con ese string.
-# El login de FAKE_USERS todavía compara la clave en texto plano. Estas dos
-# funciones quedan listas para cuando el login lea la tabla users.
+# El login de la sección 12 usa estas dos. FAKE_USERS comparaba la clave en texto plano.
 password_hash = PasswordHash.recommended()
 
 # tokenUrl es relativo al servidor. Swagger manda usuario y clave a esa ruta.
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+# Sección 8: tokenUrl="/api/v1/auth/login"
+# Sección 12: el botón Authorize pega a /token, que sigue siendo un formulario.
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/token")
 
 # 401: no está autenticado (no hay token, o el token no sirve).
 # WWW-Authenticate le dice al cliente que el esquema es Bearer.
@@ -84,9 +99,11 @@ def raise_frobidden():
     )
 
 
-# Sección 11. Otro 401, con otro texto. La clase lo usa cuando el token
-# no se puede leer o cuando el usuario de la tabla no existe o está inactivo.
-# get_current_user de abajo sigue usando credentials_exc ("No autenticado").
+# Sección 11. Otro 401, con otro texto. La sección 12 lo usa cuando el token
+# no se puede leer, cuando la clave no coincide, o cuando el usuario de la
+# tabla no existe o está inactivo.
+# get_current_user usa credentials_exc ("No autenticado") si falta sub,
+# y este 401 si la fila no está o está inactiva.
 def invalid_credentials():
     return HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -94,107 +111,106 @@ def invalid_credentials():
     )
 
 
-def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
-    # copy() para no modificar el dict que mandó el login.
-    to_encode = data.copy()
-    # exp es el claim estándar de vencimiento. PyJWT lo compara con la hora UTC.
-    # La clase escribe Optional[timedelta]. timedelta | None es el equivalente.
-    expire = datetime.now(tz=timezone.utc) + (
-        expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+# Sección 8. El login metía un dict (email en sub, más username) y un timedelta.
+# La sección 12 lo comenta en la clase y lo reemplaza por create_access_token(sub, minutes).
+# def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
+#     to_encode = data.copy()
+#     expire = datetime.now(tz=timezone.utc) + (
+#         expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+#     )
+#     to_encode.update({"exp": expire})
+#     token = jwt.encode(payload=to_encode, key=SECRET_KEY, algorithm=ALGORITHM)
+#     return token
+
+
+# sub es el id del usuario, en texto. El token solo lleva sub y exp.
+# No lleva username: la sección 12 lo saca. minutes=None usa el valor del .env.
+def create_access_token(sub: str, minutes: int | None = None) -> str:
+    expire = datetime.now(tz=timezone.utc) + timedelta(
+        minutes=minutes or settings.ACCESS_TOKEN_EXPIRE_MINUTES
     )
-    to_encode.update({"exp": expire})
-    # jwt.encode devuelve el string del token. key es SECRET_KEY.
-    token = jwt.encode(payload=to_encode, key=SECRET_KEY, algorithm=ALGORITHM)
-    return token
+    # La clase firma con settings.JWT_SECRET y settings.JWT_ALG.
+    # SECRET_KEY y ALGORITHM de este archivo son los mismos valores.
+    return jwt.encode(
+        {"sub": sub, "exp": expire},
+        settings.JWT_SECRET,
+        algorithm=settings.JWT_ALG,
+    )
 
 
 def decode_token(token: str) -> dict:
     # algorithms es una lista a propósito: si el token dice otro algoritmo, se rechaza.
     # La clase nombra la variable playload. Es un typo de payload; acá va el nombre correcto.
-    payload = jwt.decode(jwt=token, key=SECRET_KEY, algorithms=[ALGORITHM])
+    # Sección 11 este decode usaba settings.SECRET_KEY y settings.ALGORITHM,
+    # nombres que config.py no tenía (solo JWT_SECRET y JWT_ALG). Esos alias se
+    # agregaron para que no reviente. La sección 12 pasa a JWT_SECRET y JWT_ALG.
+    payload = jwt.decode(
+        jwt=token,
+        key=settings.JWT_SECRET,
+        algorithms=[settings.JWT_ALG],
+    )
     return payload
 
 
 # Depends(oauth2_scheme) exige el header Authorization. Si falta, FastAPI responde 401
 # antes de entrar a esta función.
 #
-# La clase 8 la escribió async:
-# async def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
+# Sección 8. Devolvía el dict del token, sin mirar la tabla:
+# def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
+#     payload = decode_token(token)
+#     sub = payload.get("sub")          # el email
+#     username = payload.get("username")
+#     if not sub or not username:
+#         raise credentials_exc
+#     return {"email": sub, "username": username}
 #
-# Hoy es def porque adentro no hay nada que esperar: decode_token es un cálculo
-# en memoria. async sin await no espera y el editor avisa.
+# Sección 11. Buscaba la fila, pero además exigía username. El token nuevo no lo trae,
+# así que esa versión rechazaba toda sesión. La sección 12 saca el chequeo de username.
+# async def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)) -> User:
+#     playload = decode_token(token)
+#     sub = playload.get("sub")
+#     username = playload.get("username")
+#     if not sub or not username:
+#         raise credentials_exc
+#     user_id = int(sub)
 #
-# Cuando la revisión implique una espera (buscar el usuario en la base, llamar
-# a otro servicio), vuelve a ser async y esa espera se escribe con await:
-#     user = await buscar_usuario(sub)
-# Mientras el await espera, el servidor puede atender otros requests.
-# Eso es lo que evita el bloqueo. FastAPI acepta las dos formas en un Depends.
-def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
+# La clase 12 la escribe async. Acá es def: db.get es una lectura síncrona, no hay await.
+# async sin await no espera y el editor avisa. Si la sesión fuera async, la línea
+# sería `user = await db.get(User, user_id)` y la función volvería a ser async.
+# Mientras ese await espera, el servidor puede atender otros requests.
+def get_current_user(
+    db: Session = Depends(get_db),
+    token: str = Depends(oauth2_scheme),
+) -> User:
     try:
         payload = decode_token(token)
-        # sub es el sujeto del token. En el login guardamos el email ahí.
+        # sub es el id de users, en texto. Lo puso create_access_token.
         sub: str | None = payload.get("sub")
-        username: str | None = payload.get("username")
-        if not sub or not username:
+        # Sección 11 también leía username y rechazaba el token si faltaba.
+        # La sección 12 lo quita: el token ya no guarda ese dato.
+        if not sub:
             raise credentials_exc
 
-        # Este dict es el "usuario actual". create_post lo usa como autor.
-        return {"email": sub, "username": username}
+        user_id = int(sub)
     except ExpiredSignatureError:
         raise raise_expired_token()
     except InvalidTokenError:
         raise credentials_exc
+    except PyJWTError:
+        # Cubre lo que no entró en las dos de arriba. La clase lo agrega en la 11.
+        raise invalid_credentials()
+    except ValueError:
+        # La clase no atrapa esto. int("ricardo@example.com") lanza ValueError
+        # y FastAPI lo vería como 500. Un token de la sección 8 trae el email en sub.
+        raise credentials_exc
 
+    # db.get busca por id. None si esa fila no está.
+    user = db.get(User, user_id)
 
-# La clase 11 reemplaza get_current_user por esto. No está activo.
-#
-# async def get_current_user(
-#     db: Session = Depends(get_db),
-#     token: str = Depends(oauth2_scheme),
-# ) -> User:
-#     try:
-#         playload = decode_token(token)
-#         sub = playload.get("sub")
-#         username = playload.get("username")
-#         if not sub or not username:
-#             raise credentials_exc
-#         user_id = int(sub)
-#     except ExpiredSignatureError:
-#         raise raise_expired_token()
-#     except InvalidTokenError:
-#         raise credentials_exc
-#     except PyJWTError:
-#         raise invalid_credentials()
-#     user = db.get(User, user_id)
-#     if not user or not user.is_active:
-#         raise invalid_credentials()
-#     return user
-#
-# No reemplaza a la función de arriba por tres motivos:
-# 1. El login sigue guardando el email en sub, no el id de la tabla users.
-#    int(sub) con "ricardo@example.com" lanza ValueError, que esta función no atrapa.
-# 2. Pide username dentro del token y, a la vez, la clase cambia create_access_token
-#    para guardar solo sub y exp. Un token armado con esa firma nueva no trae
-#    username, así que el if not username siempre rechazaría la sesión.
-#    Esa firma nueva, comentada, sería:
-#    def create_access_token(sub: str, minutes: int | None = None) -> str:
-#        expire = datetime.now(timezone.utc) + timedelta(
-#            minutes=minutes or settings.ACCESS_TOKEN_EXPIRE_MINUTES
-#        )
-#        return jwt.encode(
-#            {"sub": sub, "exp": expire},
-#            settings.JWT_SECRET,
-#            algorithm=settings.JWT_ALG,
-#        )
-#    El login llama create_access_token(data=..., expires_delta=...).
-#    Cambiar la firma rompe ese llamado. Se deja la de la sección 8.
-# 3. Es async y no tiene await. La lectura db.get es síncrona. El editor avisa,
-#    igual que en la sección 8. Cuando el usuario salga de la base y esa espera
-#    sea real, la función vuelve a ser async y la consulta va con await.
-#
-# decode_token de la clase usa settings.SECRET_KEY y settings.ALGORITHM,
-# y nombra la variable playload. Esos dos nombres existen en config.py
-# como alias de JWT_SECRET y JWT_ALG. La función activa usa SECRET_KEY y ALGORITHM.
+    if not user or not user.is_active:
+        raise invalid_credentials()
+
+    return user
 
 
 def hash_password(plain: str) -> str:
@@ -207,15 +223,35 @@ def verify_password(plain: str, hashed: str) -> bool:
     return password_hash.verify(plain, hashed)
 
 
-# Devuelve una dependencia. require_role("editor") se usa como Depends(require_editor).
+# Formulario de Swagger (POST /api/v1/auth/token).
+# La clase lo escribe async y arma el usuario con UserRepository acá mismo:
+# async def auth2_token(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+#     repository = UserRepository(db)
+#     user = repository.get_by_email(form.username)
+#     if not user or not verify_password(form.password, user.hashed_password):
+#         raise invalid_credentials()
+#     token = create_access_token(sub=str(user.id))
+#     return {"access_token": token, "token_type": "bearer"}
+# El nombre auth2_token le falta la "o" de oauth2. Se deja el de la clase.
+# Es def porque no hay await. El chequeo de la clave vive en AuthService,
+# el mismo que usa POST /login, para no repetirlo.
+def auth2_token(
+    form: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db),
+):
+    from app.api.v1.auth.service import AuthService
+
+    return AuthService(db).token_for(form.username, form.password)
+
+
+# Devuelve una dependencia. En una ruta: Depends(require_editor).
 # order compara roles: user < editor < admin. Si el rol es menor, 403.
-# Hoy ninguna ruta la usa. get_current_user devuelve un dict (email, username),
-# y un dict no tiene .role. Cuando el usuario salga de la tabla users, esta
-# función recibe ese User y user.role existe.
+# La sección 12 la engancha en tags (crear y editar: editor, borrar: admin,
+# el más usado: user) y en PUT /auth/role (admin).
 def require_role(min_role: Literal["user", "editor", "admin"]):
     order = {"user": 0, "editor": 1, "admin": 2}
 
-    def evaluation(user=Depends(get_current_user)):
+    def evaluation(user: User = Depends(get_current_user)) -> User:
         if order[user.role] < order[min_role]:
             raise raise_frobidden()
         return user
