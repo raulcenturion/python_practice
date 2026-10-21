@@ -66,6 +66,26 @@ curl -X POST http://127.0.0.1:8000/api/v1/auth/login \
 El botón Authorize de `/docs` no usa ese JSON: manda el formulario a
 `POST /api/v1/auth/token`. En el campo username va el email.
 
+Sección 14. Carga datos de práctica (admin, categorías y etiquetas) sin pasar por la API.
+Hay que estar en `fastApi/`, que es donde vive el paquete `app`:
+
+```bash
+cd fastApi
+source ../.venv/bin/activate
+python3 -m app.seeds all
+```
+
+`all` carga las tres listas. También se puede una sola: `users`, `categories` o `tags`.
+Si el email, el slug o el tag ya están, no inserta otra fila. El admin de práctica
+queda en `admin@example.com` / `Admin123!`.
+
+Sección 15. Middlewares en `app/core/middleware.py`. CORS deja que el navegador
+de `cors-demo` (http://localhost:3000) lea la API. La clase nombra el puerto
+5555 y el 5173; este repo suma el 3000, que es donde corre ese frontend.
+Cada request también loguea entrada y salida, y agrega `X-Process-Time` y
+`X-Request-ID`. Para probarlo, con la API en el 8000 y `npm run dev` en `cors-demo`,
+abrir http://localhost:3000 y apretar **Probar conexión**.
+
 Crear, editar y borrar un post pide el header `Authorization: Bearer <access_token>`.
 Listar y leer posts siguen abiertos. Crear o editar un tag pide rol editor.
 Borrar un tag pide admin. El mapa está en `app/__init__.py`.
@@ -85,6 +105,8 @@ Estos los pide la clase y no vienen con Python:
 | `email-validator` | `EmailStr` en los schemas | 6 |
 | `pwdlib[argon2]` | Hashea la clave. `PasswordHash` en `app/core/security.py` | 11 |
 | `passlib` | Otra librería para hashear claves (`CryptContext`). No es `pwdlib` | 11 |
+| `typer` | Comandos de terminal. `python3 -m app.seeds` | 14 |
+| `python-slugify` | Arma el slug del post. El import es `slugify` | 14 |
 
 `pwdlib` y `passlib` son dos paquetes distintos. El código de la clase importa
 `pwdlib`. `passlib` queda instalado para tenerlo en el proyecto.

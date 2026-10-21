@@ -30,6 +30,13 @@ pwdlib==0.3.1
 # Otra librería de hashes (passlib.context.CryptContext). No reemplaza a pwdlib:
 # security.py importa pwdlib. Queda instalado para tenerlo en el proyecto.
 passlib==1.7.4
+# Sección 14. pip install typer
+# CLI de python3 -m app.seeds. typer ya venía en el venv; se deja fijado.
+typer==0.27.2
+# Sección 14. pip install python-slugify
+# El import es slugify (app/utils/slugify_utils.py). text-unidecode lo trae el paquete.
+python-slugify==9.1.3
+text-unidecode==1.3
 argon2-cffi==25.1.0
 argon2-cffi-bindings==26.1.0
 cffi==2.1.1

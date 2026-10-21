@@ -1,4 +1,8 @@
 # Tabla authors. Un autor tiene muchos posts.
+# Sección 13: el post ya no apunta acá. Apunta a users (columna user_id).
+# models/__init__.py deja de importar este archivo para que SQLAlchemy no
+# registre la relación back_populates="author", que PostORM ya no tiene.
+# El archivo se queda: no se borra la tabla vieja del código, solo deja de usarse.
 #
 # from __future__ import annotations  →  biblioteca estándar.
 #   Guarda las anotaciones (List["PostORM"], etc.) como texto y no las evalúa ahora.

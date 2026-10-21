@@ -7,11 +7,13 @@
 #   Tuple[int, list] hoy se escribe tuple[int, list[...]].
 # sqlalchemy    → select y func arman el SQL. Session lo ejecuta.
 #   selectinload, joinedload → cómo traer las relaciones en una consulta.
-# app.models    → las tablas. PostORM, AuthorORM, TagORM.
+# app.models    → las tablas. PostORM, TagORM y, desde la sección 13, User.
+#   AuthorORM ya no se importa: el post no apunta a authors.
 
 from math import ceil
 
-from app.models import AuthorORM, PostORM, TagORM
+from app.models import PostORM, TagORM, User
+from app.utils.slugify_utils import ensure_unique_slug
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, joinedload, selectinload
 
@@ -26,6 +28,11 @@ class PostRepository:
     def get(self, post_id: int) -> PostORM | None:
         post_find = select(PostORM).where(PostORM.id == post_id)
         return self.db.execute(post_find).scalar_one_or_none()
+
+    # Sección 14. Un post por slug, o None. La ruta es GET /posts/post/{slug}.
+    def get_by_slug(self, slug: str) -> PostORM | None:
+        query = select(PostORM).where(PostORM.slug == slug)
+        return self.db.execute(query).scalar_one_or_none()
 
     # Busca por título, ordena y corta la página.
     # Devuelve (cantidad total, posts de esta página). La clase lo anota Tuple[int, List[PostORM]].
@@ -81,7 +88,8 @@ class PostRepository:
             select(PostORM)
             .options(
                 selectinload(PostORM.tags),
-                joinedload(PostORM.author),
+                # Sección 13. Antes: joinedload(PostORM.author)
+                joinedload(PostORM.user),
             )
             .where(PostORM.tags.any(func.lower(TagORM.name).in_(normalized_tag_names)))
             .order_by(PostORM.id.asc())
@@ -89,21 +97,23 @@ class PostRepository:
 
         return self.db.execute(post_list).scalars().all()
 
-    # Si el email ya existe, devuelve ese autor. Si no, lo inserta.
-    def ensure_author(self, name: str, email: str) -> AuthorORM:
-        author_obj = self.db.execute(
-            select(AuthorORM).where(AuthorORM.email == email)
-        ).scalar_one_or_none()
-
-        if author_obj:
-            return author_obj
-
-        author_obj = AuthorORM(name=name, email=email)
-        self.db.add(author_obj)
-        # flush manda el INSERT y consigue el id, sin cerrar la transacción.
-        self.db.flush()
-
-        return author_obj
+    # Sección 13. Antes, si el email no estaba en authors, insertaba AuthorORM:
+    # def ensure_author(self, name: str, email: str) -> AuthorORM:
+    #     author_obj = self.db.execute(
+    #         select(AuthorORM).where(AuthorORM.email == email)
+    #     ).scalar_one_or_none()
+    #     if author_obj:
+    #         return author_obj
+    #     author_obj = AuthorORM(name=name, email=email)
+    #     self.db.add(author_obj)
+    #     self.db.flush()
+    #     return author_obj
+    # Ahora solo busca en users. La clase sigue recibiendo name, pero no lo escribe:
+    # el nombre ya está en la fila. Sonar marca ese parámetro como sin uso.
+    # Se saca de la firma. Si el email no está, devuelve None. La clase anota
+    # el retorno como User, pero scalar_one_or_none puede ser None.
+    def ensure_author(self, email: str) -> User | None:
+        return self.db.execute(select(User).where(User.email == email)).scalar_one_or_none()
 
     # Igual que el autor: si el nombre ya existe, devuelve esa fila.
     # Antes: TagORM.name.ilike(name). ilike es "parecido", no "igual".
@@ -137,13 +147,31 @@ class PostRepository:
         author,
         tags: list[dict],
         image_url: str | None = None,
+        category_id: int | None = None,
     ) -> PostORM:
+        # La clase mete el usuario así, en la firma del repositorio:
+        # author: User = Depends(get_current_user)
+        # Depends solo lo resuelve FastAPI en una ruta. En este método no corre.
+        # El usuario llega como argumento, desde PostService, que lo recibió del router.
+        # También importa get_current_user y fastapi.Depends en el repository. No van.
         # La clase asigna el autor en el constructor y hace db.add al final.
         # Si el autor ya está en la sesión y el post todavía no, SQLAlchemy avisa
         # "not in session". Por eso el post entra a la sesión antes de colgarle relaciones.
         # Antes: PostORM(title=title, content=content)
         # Sección 10: image_url es la ruta /media/... o None si no hubo archivo.
-        post = PostORM(title=title, content=content, image_url=image_url)
+        # Sección 13. category_id es la columna. La relación category la completa
+        # SQLAlchemy al leer el post, si ese id existe.
+        # Sección 14. El slug sale del título. Si "mi-post" ya existe, usa "mi-post-2".
+        # La clase lo calcula y lo pasa en el constructor, junto con user.
+        # Acá el user se cuelga después, para no dejar el post fuera de la sesión.
+        unique_slug = ensure_unique_slug(self.db, title)
+        post = PostORM(
+            title=title,
+            slug=unique_slug,
+            content=content,
+            image_url=image_url,
+            category_id=category_id,
+        )
         self.db.add(post)
 
         if author:
@@ -151,11 +179,13 @@ class PostRepository:
             # El body traía Author, con name y email.
             # Sección 8: el token era un dict. username se guardaba en authors.name.
             # post.author = self.ensure_author(author["username"], author["email"])
-            # Sección 12: get_current_user devuelve la fila User. No tiene username.
-            # El nombre es full_name. Si el registro no lo mandó, se usa el email
-            # para no dejar la columna vacía.
-            name = author.full_name or author.email
-            post.author = self.ensure_author(name, author.email)
+            # Sección 12: se creaba (o reusaba) un AuthorORM con full_name.
+            # name = author.full_name or author.email
+            # post.author = self.ensure_author(name, author.email)
+            # Sección 13: ensure_author busca el User y el post apunta a esa fila.
+            # La clase llama ensure_author(author.full_name, author.email).
+            # full_name ya no entra: el parámetro name no se usaba.
+            post.user = self.ensure_author(author.email)
 
         # Sección 11. La clase toma solo el primer tag y parte el nombre por comas:
         # names = tags[0]["name"].split(",")

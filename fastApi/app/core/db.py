@@ -30,9 +30,12 @@ engine_kwargs = {}
 if DATABASE_URL.startswith("sqlite"):
     engine_kwargs["connect_args"] = {"check_same_thread": False}
 
-# echo=True imprime el SQL en la terminal. future=True pide el estilo de SQLAlchemy 2
+# Hasta la sección 14 la clase usa echo=True: imprime cada SQL en la terminal.
+# Sección 15 lo pasa a False. Si queda en True, el ENTRADA/SALIDA del middleware
+# se pierde entre las consultas. future=True pide el estilo de SQLAlchemy 2
 # (en la versión 2 ya es el default; la clase lo deja escrito igual).
-engine = create_engine(DATABASE_URL, echo=True, future=True, **engine_kwargs)
+# engine = create_engine(DATABASE_URL, echo=True, future=True, **engine_kwargs)
+engine = create_engine(DATABASE_URL, echo=False, future=True, **engine_kwargs)
 
 # autoflush=False: no manda cambios solos; hay que flush() o commit().
 # autocommit=False: hay que llamar db.commit() para guardar.

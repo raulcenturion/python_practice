@@ -138,6 +138,27 @@ def filter_by_tags(
     return PostService(db).filter_by_tags(tags)
 
 
+# Sección 14. Lee un post por el slug, no por el id.
+# La URL queda /posts/post/{slug} porque este router ya tiene prefix="/posts"
+# y la clase agrega otro "/post/" adelante. No choca con /{post_id}:
+# ese parámetro es un entero y esta ruta tiene un segmento de más.
+# La clase la pegó después de delete. Va junto a las lecturas.
+# También importa `from app.api.v1.auth import repository` y no lo usa. No va.
+@router.get("/post/{slug}", response_model=PostPublic | PostSummary)
+def get_post_by_slug(
+    slug: str,
+    include_content: bool = Query(default=True, description="Incluir o no el contenido"),
+    db: Session = Depends(get_db),
+):
+    # La clase:
+    # repository = PostRepository(db)
+    # post = repository.get_by_slug(slug)
+    # if not post: raise HTTPException(404, "post no encontrado")
+    # if include_content: return PostPublic.model_validate(post, from_attributes=True)
+    # return PostSummary.model_validate(post, from_attributes=True)
+    return PostService(db).get_post_by_slug(slug, include_content)
+
+
 # Sección 8. La clase pegó esta ruta al final del archivo, después de /{post_id}.
 # Va antes: si no, "secure" compite con el id. oauth2_scheme solo exige que el
 # header traiga un token; no mira si venció ni de quién es. Para eso está get_current_user.

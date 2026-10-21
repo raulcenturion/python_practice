@@ -8,7 +8,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
 from app.core.db import Base
@@ -24,20 +24,31 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-# PostORM nombra a AuthorORM y a TagORM solo como tipos.
+# PostORM nombra a User, TagORM y CategoryORM solo como tipos.
 # Esas clases, a su vez, nombran a PostORM. Importarlas de verdad acá
-# cierra el círculo (post → author → post).
+# cierra el círculo (post → user → post).
 #
 # Cómo se usa TYPE_CHECKING:
 #   1. from __future__ import annotations deja las anotaciones sin evaluar.
 #   2. if TYPE_CHECKING: el import de abajo NO corre cuando levantás la API.
 #   3. Un type checker (Pyright, mypy) sí entra a ese if y entiende los nombres.
-#   4. En tiempo de ejecución, "AuthorORM" entre comillas es solo texto.
+#   4. En tiempo de ejecución, "User" entre comillas es solo texto.
 # La clase importa List dos veces y también Optional. Con annotations alcanza
-# con list[...] y AuthorORM | None. Optional[X] es lo mismo que X | None.
+# con list[...] y User | None. Optional[X] es lo mismo que X | None.
+# Sección 13 cambia el import de AuthorORM por User y suma CategoryORM.
 if TYPE_CHECKING:
-    from .author import AuthorORM
+    # from .author import AuthorORM
+    from .category import CategoryORM
     from .tag import TagORM
+    from .user import User
+
+
+# La clase usa datetime.utcnow. Está deprecado y Sonar lo marca.
+# now(timezone.utc) es la hora UTC. replace quita la zona porque la columna
+# DateTime de la clase no guarda zona: queda el mismo UTC ingenuo que utcnow.
+# SQLAlchemy llama esta función en cada INSERT, no al importar el módulo.
+def _utc_now() -> datetime:
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 # Tabla puente. No es una clase ORM: no hay un TagDePost que consultar.
@@ -57,6 +68,10 @@ class PostORM(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     title: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
+    # Sección 14. Texto corto del título, único. "Mi primer post" → "mi-primer-post".
+    # Lo arma ensure_unique_slug al crear. create_all no agrega esta columna
+    # a un posts que ya existe: hay que borrar blog.db y volver a levantar.
+    slug: Mapped[str] = mapped_column(String(160), unique=True, index=True)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     # Sección 10. Ruta de la imagen, o NULL si el post no tiene.
     # La clase escribe image_url = mapped_column(...) sin el tipo Mapped.
@@ -64,13 +79,25 @@ class PostORM(Base):
     # create_all no agrega columnas a una tabla que ya existe. Si blog.db es viejo,
     # hay que borrar ese archivo para que esta columna se cree.
     image_url: Mapped[str | None] = mapped_column(String(300), nullable=True)
-    # La clase usa datetime.utcnow (hora UTC sin zona). El equivalente actual
-    # es datetime.now(timezone.utc). Se deja utcnow para coincidir con el módulo.
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_utc_now)
 
-    # author_id es la columna real. author es el objeto AuthorORM, si hay uno.
-    author_id: Mapped[int | None] = mapped_column(ForeignKey("authors.id"))
-    author: Mapped[AuthorORM | None] = relationship(back_populates="posts")
+    # Sección 13. Antes el post colgaba de authors:
+    # author_id: Mapped[int | None] = mapped_column(ForeignKey("authors.id"))
+    # author: Mapped[AuthorORM | None] = relationship(back_populates="posts")
+    # Ahora cuelga de users. user_id es la columna. user es la fila User, si hay una.
+    # create_all no cambia una tabla posts que ya existe. Hay que borrar blog.db
+    # para que user_id y category_id se creen. author_id no se borra solo.
+    user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"))
+    user: Mapped[User | None] = relationship(back_populates="posts")
+
+    # ondelete="SET NULL": si se borra la categoría, la base deja el post y vacía esta columna.
+    # nullable=True: el post puede no tener categoría. El formulario de alta igual la pide.
+    category_id: Mapped[int | None] = mapped_column(
+        ForeignKey("categories.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+    category: Mapped[CategoryORM | None] = relationship(back_populates="posts")
 
     # secondary=post_tags usa el objeto Table de arriba (tag.py usa el nombre en texto).
     # passive_deletes=True: al borrar el post, la base limpia post_tags (ON DELETE CASCADE)

@@ -13,6 +13,7 @@
 
 from math import ceil
 
+from app.models.category import CategoryORM
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import Session
 
@@ -80,6 +81,20 @@ class PostService:
 
         return PostSummary.model_validate(post, from_attributes=True)
 
+    # Sección 14. Igual que get_post, pero busca por slug.
+    # La clase lo hace en la ruta, contra el repository:
+    # post = PostRepository(db).get_by_slug(slug)
+    # if not post: raise HTTPException(404, "post no encontrado")
+    # El 404 y la elección del schema quedan en el servicio, como el get por id.
+    # El texto "post no encontrado" es el de la clase, en minúscula.
+    def get_post_by_slug(self, slug: str, include_content: bool) -> PostPublic | PostSummary:
+        post = self.repository.get_by_slug(slug)
+        if not post:
+            raise HTTPException(status_code=404, detail="post no encontrado")
+        if include_content:
+            return PostPublic.model_validate(post, from_attributes=True)
+        return PostSummary.model_validate(post, from_attributes=True)
+
     # Antes el try/commit/rollback estaba en router.create_post.
     # Se mudó porque guardar o deshacer la transacción es la operación completa.
     # El 201 lo sigue declarando el router, en el decorador de la ruta.
@@ -92,6 +107,13 @@ class PostService:
             # author=(data.author.model_dump() if data.author else None),
             # Sección 8: author era el dict del token ({email, username}).
             # Sección 12: es la fila User que devolvió get_current_user.
+            # Sección 13. La clase pasa category_id en la llamada del router al
+            # repository. Acá sale de PostCreate, que es lo que el servicio ya tiene.
+            # La clase no revisa que ese id exista. Si no está, la respuesta trae
+            # category en null aunque el número se haya guardado (SQLite no obliga
+            # la clave foránea salvo que se prenda). Se responde 404 antes de insertar.
+            if data.category_id is not None and self.db.get(CategoryORM, data.category_id) is None:
+                raise HTTPException(status_code=404, detail="Categoría no encontrada")
             post = self.repository.create_post(
                 title=data.title,
                 content=data.content,
@@ -99,6 +121,7 @@ class PostService:
                 tags=[tag.model_dump() for tag in data.tags],
                 # Sección 10. La ruta ya guardó el archivo y manda la URL, o None.
                 image_url=image_url,
+                category_id=data.category_id,
             )
             self.db.commit()  # acá se confirma la transacción
             self.db.refresh(post)  # relee la fila por si la base completó columnas

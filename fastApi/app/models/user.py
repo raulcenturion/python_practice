@@ -11,16 +11,33 @@
 # sqlalchemy.Enum       → la columna solo acepta user, editor o admin.
 # sqlalchemy.String     → texto con largo máximo.
 
-from datetime import datetime
-from typing import Literal
+# from __future__ import annotations deja list[PostORM] como texto.
+# Así PostORM no hace falta al correr la app y no se cierra el círculo con post.py.
+from __future__ import annotations
+
+from datetime import datetime, timezone
+from typing import TYPE_CHECKING, Literal
 
 from app.core.db import Base
 from sqlalchemy import Boolean, DateTime, Enum, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+# La clase importa PostORM acá, en tiempo de ejecución:
+#   from app.models.post import PostORM
+# post.py, a su vez, nombra a User. Ese import cierra el círculo user → post → user.
+# TYPE_CHECKING no corre al levantar la API. La anotación va entre comillas.
+if TYPE_CHECKING:
+    from .post import PostORM
 
 # El mismo Literal está en api/v1/auth/schemas.py (el JSON).
 # Acá describe la columna. Allá describe el body. No se importan entre sí.
 Role = Literal["user", "editor", "admin"]
+
+
+# Igual que posts._utc_now. La clase usa datetime.utcnow.
+# Sonar lo marca. now(timezone.utc) sin zona guarda el mismo UTC ingenuo.
+def _utc_now() -> datetime:
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 # Las otras tablas se llaman AuthorORM, PostORM, TagORM.
@@ -42,5 +59,8 @@ class User(Base):
         default="user",
     )
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    # utcnow está deprecado. La clase lo usa igual que created_at de los posts.
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=_utc_now)
+
+    # Sección 13. Los posts de este usuario. back_populates="user" es el lado
+    # que está en PostORM. La clase anota Mapped[List["PostORM"]]. list[...] es lo mismo.
+    posts: Mapped[list[PostORM]] = relationship(back_populates="user")

@@ -12,6 +12,8 @@
 # app.api.v1.auth.router   → login y /me. Sección 8.
 # app.api.v1.uploads.router → subir archivos. Sección 10.
 # app.api.v1.tags.router    → CRUD de etiquetas. Sección 11.
+# app.api.v1.categories.router → CRUD de categorías. Sección 13.
+# app.core.middleware      → Sección 15. CORS, tiempo, log, id y bloqueo de IP.
 # StaticFiles              → publica una carpeta del disco como URL.
 
 import os
@@ -21,10 +23,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from app.api.v1.auth.router import router as auth_router
+from app.api.v1.categories.router import router as category_router
 from app.api.v1.posts.router import router as post_router
 from app.api.v1.tags.router import router as tag_router
 from app.api.v1.uploads.router import router as upload_router
 from app.core.db import Base, engine
+from app.core.middleware import register_middleware
 
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
@@ -36,10 +40,20 @@ MEDIA_DIR = "app/media"
 
 # create_app deja crear la app en los tests sin ejecutar el archivo como script.
 def create_app() -> FastAPI:
-    app = FastAPI(title="Mini Blog")
+    # Sección 14. persistAuthorization: el botón Authorize de /docs guarda el token
+    # en el navegador. Al recargar la página no hay que pegarlo de nuevo.
+    # Sin esto, Swagger olvida el Bearer en cada refresh.
+    app = FastAPI(
+        title="Mini Blog",
+        swagger_ui_parameters={"persistAuthorization": True},
+    )
     # Crea las tablas si no existen. La clase lo marca como dev:
     # en un proyecto real las tablas las arma una migración (Alembic), no esto.
     Base.metadata.create_all(bind=engine)
+
+    # Sección 15. Envuelve todas las rutas: CORS, tiempo, log, id de request
+    # y el bloqueo de IP. La clase lo llama en este punto, antes de include_router.
+    register_middleware(app)
 
     # Sección 8. El router de auth ya trae prefix="/auth".
     # Este prefix arma /api/v1/auth/login, la misma URL que tokenUrl en security.py.
@@ -50,6 +64,8 @@ def create_app() -> FastAPI:
     # Sección 11. El router ya trae prefix="/tags". Queda /tags, sin /api/v1,
     # igual que /posts. La clase lo incluye en el mismo lugar.
     app.include_router(tag_router)
+    # Sección 13. El router ya trae prefix="/categories". Queda /categories.
+    app.include_router(category_router)
     # Sección 10. /upload/bytes, /upload/file y /upload/save.
     # El router ya trae prefix="/upload", por eso acá no se agrega otro.
     app.include_router(upload_router)

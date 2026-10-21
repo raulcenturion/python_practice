@@ -20,6 +20,8 @@
 #       repository.py  → Encapsula consultas y operaciones en la base de datos.
 #
 #   core/db.py         → Configuración de la conexión a la base de datos (engine, sesión).
+#   core/middleware.py → Sección 15. CORS, tiempo de proceso, log, X-Request-ID
+#                        y bloqueo de IP. register_middleware(app) se llama en main.py.
 #   core/config.py     → Sección 11. Clave, algoritmo y minutos del JWT.
 #   core/security.py   → Firma el JWT. Sección 12: get_current_user lee la fila users
 #                        (el sub del token es el id). hash_password, verify_password,
@@ -32,6 +34,12 @@
 #       repository.py  → SQL de users: por id, por email, alta, set_role.
 #       schemas.py     → UserPublic, UserCreate, UserLogin, TokenResponse, RoleUpdate.
 #
+#   api/v1/categories/ → Sección 13. CRUD de categorías.
+#       router.py      → /categories. La clase llama al repository y hace commit en la ruta.
+#       service.py     → Ese commit y el 400/404 viven acá.
+#       repository.py  → SQL de categories. list, get, alta, update, delete.
+#       schemas.py     → CategoryCreate, CategoryUpdate, CategoryPublic.
+#
 #   api/v1/tags/       → Sección 11. CRUD de etiquetas.
 #       router.py      → /tags. La clase llama al repository y hace commit en la ruta.
 #       service.py     → Ese commit y el 404/500 viven acá, igual que en posts.
@@ -39,15 +47,21 @@
 #       schemas.py     → TagPublic, TagCreate, TagUpdate, TagWithCount.
 #
 #   services/pagination.py → Corta un SELECT en páginas. Lo usa el listado de tags.
+#   utils/slugify_utils.py → Sección 14. Arma el slug único de un post.
+#   seeds/                 → Sección 14. Carga usuarios, categorías y tags de práctica.
+#       Se corre desde fastapi/: python3 -m app.seeds all
+#       all carga las tres listas. users, categories y tags cargan una sola.
 #
 #   api/v1/uploads/router.py → Sección 10. Recibir un archivo (bytes, UploadFile o guardarlo).
 #   services/file_storage.py → Escribe la imagen en app/media y devuelve /media/<nombre>.
 #   main.py monta esa carpeta con StaticFiles para poder abrir la imagen en el navegador.
 #
 #   models/            → Modelos declarativos de SQLAlchemy (tablas y relaciones).
-#       post.py, author.py, tag.py, user.py (tabla users; el login de la sección 12 la usa)
+#       post.py, author.py (ya no se importa: el post apunta a users),
+#       tag.py, user.py, category.py (sección 13)
 #
-#   main.py            → Punto de entrada de la aplicación, monta los routers.
+#   main.py            → Punto de entrada de la aplicación, monta los routers
+#                        y, desde la sección 15, los middlewares.
 #
 # Responsabilidades:
 # - Router: recibe la petición HTTP, valida con schemas y delega al servicio.
@@ -74,7 +88,8 @@
 #   4. Antes de la función, Depends(get_current_user) lee el header Authorization.
 #      Sin token, o con un token vencido o mal firmado, responde 401 y no sigue.
 #      Sección 12: el sub del token es el id, y esta dependencia devuelve la fila User.
-#      El router llama a PostService(db).create_post(post, user). El autor sale de esa fila.
+#      Sección 13: el post guarda user_id (esa fila) y category_id (el formulario).
+#      El router llama a PostService(db).create_post(post, user).
 #   5. El servicio le pide el INSERT a PostRepository. El repository usa
 #      PostORM, AuthorORM y TagORM (models/). No hace commit.
 #   6. El servicio hace commit. Si el título ya existe, la base lanza IntegrityError,
