@@ -16,6 +16,8 @@
 # main.py importa FastAPI después de load_dotenv(): si no, la URL se lee tarde.
 "fastApi/app/**/*.py" = ["B008", "E501", "E402"]
 "fastapi/app/**/*.py" = ["B008", "E501", "E402"]
+# Devinote (sección 16): mismos comentarios largos que la app de la clase.
+"devinotes/**/*.py" = ["E501"]
 # Las prácticas se llaman 00_*.py a propósito. N999 no acepta un nombre que empieza con número.
 "fastApi/00_*.py" = ["N999"]
 "fastapi/00_*.py" = ["N999"]

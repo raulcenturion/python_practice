@@ -20,6 +20,7 @@
 #       repository.py  → Encapsula consultas y operaciones en la base de datos.
 #
 #   core/db.py         → Configuración de la conexión a la base de datos (engine, sesión).
+#                        Módulo 16: nota SQLAlchemy vs SQLModel, al lado de class Base.
 #   core/middleware.py → Sección 15. CORS, tiempo de proceso, log, X-Request-ID
 #                        y bloqueo de IP. register_middleware(app) se llama en main.py.
 #   core/config.py     → Sección 11. Clave, algoritmo y minutos del JWT.

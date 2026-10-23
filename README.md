@@ -21,6 +21,7 @@ Lecciones/
   scraping/
   integradores/    → repaso + proyectos de cierre
 fastApi/           → teorías y prácticas de FastAPI (siguiente etapa)
+devinotes/         → secciones 16 y 17, app nueva con SQLModel (modelos, repositories, services y routers)
 ```
 
 Cada lección:

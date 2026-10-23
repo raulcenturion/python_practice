@@ -107,6 +107,8 @@ Estos los pide la clase y no vienen con Python:
 | `passlib` | Otra librería para hashear claves (`CryptContext`). No es `pwdlib` | 11 |
 | `typer` | Comandos de terminal. `python3 -m app.seeds` | 14 |
 | `python-slugify` | Arma el slug del post. El import es `slugify` | 14 |
+| `sqlmodel` | Tablas de Devinote (`devinotes/`). Junta SQLAlchemy y Pydantic | 16 |
+| `pydantic-settings` | Lee `DATABASE_URL` y `JWT_SECRET` en `devinotes/app/core/config.py` | 16 |
 
 `pwdlib` y `passlib` son dos paquetes distintos. El código de la clase importa
 `pwdlib`. `passlib` queda instalado para tenerlo en el proyecto.

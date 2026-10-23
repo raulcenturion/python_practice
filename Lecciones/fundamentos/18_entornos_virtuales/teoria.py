@@ -47,6 +47,59 @@ print("--- Lección 18: Entornos virtuales ---")
 # - Nunca instales paquetes del proyecto sin tener el venv activado
 # - Commiteá requirements.txt; NO commitees la carpeta .venv/
 # - Fijá versiones cuando el proyecto crece (fastapi==0.115.0)
+#
+# Este repo usa esta opción: .venv en la raíz y requirements.txt.
+# .gitignore ya ignora .venv/ y .env. La clase pide no subir el entorno
+# ni el .env (ahí van claves y la URL de la base).
+
+# ============================
+# 🔹 Otras formas de aislar paquetes (clase)
+# ============================
+# Las cuatro hacen lo mismo: un Python aparte para el proyecto, la lista de
+# paquetes guardada, y poder instalar esa lista en otra máquina.
+# No se instala Pipenv, Poetry ni uv acá. El día a día de este repo es
+# source .venv/bin/activate y pip install -r requirements.txt.
+
+# --- 2) Pipenv: el venv y el lock en un solo comando ---
+# pipenv es un paquete. --user lo instala en el usuario, no en el Python global
+# del sistema. pipenv install crea el entorno y dos archivos:
+#   Pipfile       lo que pediste (requests, fastapi)
+#   Pipfile.lock  las versiones exactas, para repetir el mismo entorno
+#   pip install --user pipenv
+#   pipenv install requests fastapi
+#   pipenv shell                         entra al entorno
+#   pipenv run uvicorn app:app           corre un comando adentro, sin entrar
+#   pipenv requirements > requirements.txt
+#   pipenv install -r requirements.txt   instala desde un requirements.txt
+
+# --- 3) Poetry: pyproject.toml + lock ---
+# pipx instala programas de Python aislados (Poetry no queda mezclado con
+# los paquetes del proyecto). poetry init pregunta nombre y versión y arma
+# pyproject.toml. poetry add declara el paquete y lo instala.
+# poetry install lee el lock y deja el entorno igual en otra máquina.
+#   pipx install poetry
+#   poetry init
+#   poetry add requests fastapi
+#   poetry install
+#   poetry shell
+#   poetry run uvicorn app.main:app --reload
+#   poetry export -f requirements.txt --output requirements.txt --without-hashes
+# --without-hashes saca los hashes: el archivo se puede pasar a pip install -r.
+# Con Poetry lo que se comparte es pyproject.toml + poetry.lock y se corre
+# poetry install. requirements.txt no hace falta si todo el equipo usa Poetry.
+# El export de arriba es solo para alguien que instala con pip.
+
+# --- 4) uv: otro instalador, el mismo .venv ---
+# uv arma el entorno y usa pip por debajo, más rápido. Los comandos de activar
+# son los de venv. El archivo que queda es el mismo requirements.txt.
+#   uv venv
+#   source .venv/bin/activate          macOS / Linux
+#   .venv\Scripts\Activate.ps1         Windows (PowerShell)
+#   uv pip install requests fastapi
+#   uv pip freeze > requirements.txt
+#   uv pip install -r requirements.txt
+# uv también lee pyproject.toml, así que puede usarse al lado de Poetry.
+# En este repo no hace falta: pip contra requirements.txt alcanza.
 
 # ============================
 # 🔹 Verificar si estás dentro de un venv

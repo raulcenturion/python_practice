@@ -49,6 +49,13 @@ starlette==1.6.0
 typing-inspection==0.4.2
 typing_extensions==4.16.0
 urllib3==2.5.0
+# Sección 16, app devinotes/. pip install sqlmodel
+# El gist de la clase fija sqlmodel==0.0.27. Esa versión pide SQLAlchemy<2.1
+# y bajaría el 2.1.1 que ya usa fastapi/. 0.0.48 corre con SQLAlchemy 2.1.
+sqlmodel==0.0.48
+# pydantic-settings lee el .env de Devinote (BaseSettings en devinotes/app/core/config.py).
+# El gist lo fija en 2.11.0. En este venv ya estaba 2.15.0, compatible con pydantic 2.13.
+pydantic-settings==2.15.0
 uvicorn==0.52.4
 uvloop==0.22.1
 watchfiles==1.2.0
