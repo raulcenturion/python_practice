@@ -1,5 +1,6 @@
 # Importar estos módulos registra las tablas en SQLModel.metadata.
-# init_db hace create_all sobre ese metadata. Sin estos imports, no hay tablas.
+# Alembic (alembic/env.py) lee ese metadata para armar y comparar migraciones.
+# La sección 16 lo usaba create_all. Desde la 18 ese create_all está comentado.
 # El orden importa por las claves foráneas: user primero, después note y label,
 # y share al final porque apunta a note, user y label.
 

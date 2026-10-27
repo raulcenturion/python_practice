@@ -21,7 +21,8 @@ Lecciones/
   scraping/
   integradores/    → repaso + proyectos de cierre
 fastApi/           → teorías y prácticas de FastAPI (siguiente etapa)
-devinotes/         → secciones 16 y 17, app nueva con SQLModel (modelos, repositories, services y routers)
+devinotes/         → secciones 16 a 19, app nueva con SQLModel, Alembic y deploy
+websocket/         → sección 21, chat por WebSocket (proyecto aparte)
 ```
 
 Cada lección:
@@ -93,24 +94,120 @@ Si el tema necesita más de un archivo de teoría:
 
 Detalle en `Lecciones/integradores/README.md`.
 
-## FastAPI
+## Cómo levantar
 
-Carpeta en la raíz: `fastApi/` (venv del repo ya tiene FastAPI + Uvicorn).
+El entorno es el `.venv` de la raíz. Los comandos de abajo usan esa ruta y hay que correrlos **dentro de la carpeta de cada app**. Desde la raíz, `app` puede ser el blog o Devinote, y uvicorn no sabe cuál abrir.
+
+Cada servidor tiene su puerto. Se pueden tener los tres abiertos a la vez.
+
+| App | Puerto | Para qué |
+|-----|--------|----------|
+| Blog (`fastapi/`) | 8000 | API del curso, secciones 11 a 15. Swagger: http://127.0.0.1:8000/docs |
+| Devinote (`devinotes/`) | 8001 | SQLModel, secciones 16 a 19. Swagger: http://127.0.0.1:8001/docs |
+| Chat WebSocket (`websocket/`) | 8002 | Sección 21. Página: http://127.0.0.1:8002/ |
+| Eco WebSocket (`websocket/echo.py`) | 8003 | El mismo curso, el ejemplo corto. Socket: `ws://127.0.0.1:8003/ws/echo` |
+| Front de CORS (`cors-demo/`) | 3000 | Prueba el middleware del blog |
 
 ```bash
-# Teoría / práctica 00 (archivos en la raíz de fastApi/)
-./r fastapi/00 teoria
-./r fastapi/00
+# Blog
+cd fastapi
+../.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 
-# App mínima
-fastapi dev fastApi/00_hola_main.py
+# Datos de práctica del blog (usuarios, categorías, tags). También desde fastapi/
+../.venv/bin/python -m app.seeds all
 
-# Clase en un archivo (histórico)
-fastapi dev fastApi/blog_api.py
+# Devinote. Primero las tablas, después la API.
+cd devinotes
+../.venv/bin/python -m alembic upgrade head
+../.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8001
 
-# Clase modular: hay que entrar a la carpeta, si no esta carpeta tapa al paquete fastapi
-cd fastApi
-fastapi dev app/main.py
+# Chat. El front lo sirve esta misma app.
+cd websocket
+../.venv/bin/python -m uvicorn main:app --host 127.0.0.1 --port 8002
+
+# Eco, en otra terminal, también desde websocket/
+../.venv/bin/python -m uvicorn echo:app --host 127.0.0.1 --port 8003
+
+# Front que pega al blog para probar CORS. Pide Node 22 (hay .nvmrc).
+cd cors-demo
+nvm use
+npm run dev
 ```
+
+Sin `?username=` el chat pide el nombre con un cuadro. Con `http://127.0.0.1:8002/?username=Ana` entra directo. Dos pestañas con dos nombres se ven entre sí.
+
+```bash
+# Devinote. python -m app ya no crea tablas: init_db quedó en pass.
+cd devinotes
+../.venv/bin/python -m app
+
+# Alembic, también desde devinotes/. El init ya está hecho en este repo.
+../.venv/bin/python -m alembic init alembic
+../.venv/bin/python -m alembic revision --autogenerate -m "mensaje"
+../.venv/bin/python -m alembic upgrade +1
+../.venv/bin/python -m alembic downgrade -1
+../.venv/bin/python -m alembic downgrade base
+../.venv/bin/python -m alembic current
+../.venv/bin/python -m alembic history
+../.venv/bin/python -m alembic upgrade head --sql
+
+# Deploy de Devinote. En local no hace falta: sigue uvicorn en el 8001.
+# El detalle está en devinotes/app/core/db.py.
+cd devinotes
+../.venv/bin/python -m alembic upgrade head
+gunicorn app.main:app --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT
+
+# Seed de una sola lista, desde fastapi/. all carga las tres.
+../.venv/bin/python -m app.seeds users
+../.venv/bin/python -m app.seeds categories
+../.venv/bin/python -m app.seeds tags
+
+# Login del blog, con el servidor del 8000 ya levantado.
+curl -X POST http://127.0.0.1:8000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@example.com","password":"Admin123!"}'
+```
+
+El alta y el login de la sección 12, con el usuario de la clase, están en `fastapi/README.md`.
+
+## Entorno y lecciones
+
+Desde la raíz del repo. El script `r` usa el `.venv` solo.
+
+```bash
+source .venv/bin/activate
+pip install -r requirements.txt
+
+# Práctica y teoría. 16 y 17 no tienen practica.py: ahí va teoria.
+./r 01
+./r 01 teoria
+./r 04 practica_operaciones
+./r 16 teoria
+./r integradores/01
+./r integradores/00 presupuesto --list
+./r integradores/00 presupuesto 01
+./r logica/01
+./r regex/02 teoria
+./r scraping/01
+./r fastapi/00
+./r fastapi/00 teoria
+
+# Lo mismo, sin el atajo
+python Lecciones/fundamentos/01_print_comentarios/practica.py
+```
+
+Los `pip install` de cada clase (`pwdlib[argon2]`, `passlib`, `sqlmodel`, `alembic`, `gunicorn`, `psycopg`) ya están pinneados en `requirements.txt` y en la tabla de `fastapi/README.md`. No hace falta correrlos sueltos.
+
+## FastAPI
+
+Carpeta en la raíz: `fastApi/` (venv del repo ya tiene FastAPI + Uvicorn). El servidor de la app modular es el de la tabla de arriba, puerto 8000. `fastapi dev app/main.py` desde `fastapi/` no sirve: esa carpeta tapa al paquete `fastapi`.
+
+```bash
+# App mínima y el blog de un solo archivo. Desde la raíz, con el venv activo.
+fastapi dev fastApi/00_hola_main.py
+fastapi dev fastApi/blog_api.py
+```
+
+La app modular no se levanta con `fastapi dev app/main.py`. Ese es el comando de la clase y, desde `fastapi/`, la carpeta tapa al paquete. El que funciona es el uvicorn del puerto 8000, más arriba.
 
 Docs: http://127.0.0.1:8000/docs — detalle en `fastApi/README.md`.

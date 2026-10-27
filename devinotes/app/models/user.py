@@ -19,6 +19,12 @@ class User(SQLModel, table=True):
     full_name: str = Field(default="")
     # El texto de la clave no va acá. Lo que se guarda es el hash.
     hashed_password: str
+    # Sección 18. La clase agrega `active: bool = Field(default=True)`.
+    # default=True corre en Python al armar el objeto. No es un default de la base.
+    # La migración que agrega la columna en SQLite necesita server_default,
+    # si no el ADD COLUMN NOT NULL falla. "1" es el true de SQLite.
+    # UserRead no lo incluye: el JSON de registro sigue sin este campo.
+    active: bool = Field(default=True, sa_column_kwargs={"server_default": "1"})
 
 
 # Sin table=True no hay tabla. Son el body y la respuesta, como los schemas

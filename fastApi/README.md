@@ -109,6 +109,10 @@ Estos los pide la clase y no vienen con Python:
 | `python-slugify` | Arma el slug del post. El import es `slugify` | 14 |
 | `sqlmodel` | Tablas de Devinote (`devinotes/`). Junta SQLAlchemy y Pydantic | 16 |
 | `pydantic-settings` | Lee `DATABASE_URL` y `JWT_SECRET` en `devinotes/app/core/config.py` | 16 |
+| `alembic` | Migraciones de Devinote. Comandos en `devinotes/app/core/db.py` | 18 |
+| `psycopg[binary]` | Driver de Postgres. La URL de deploy queda `postgresql+psycopg://` | 19 |
+| `gunicorn` | Proceso del servidor. Varios workers de uvicorn. Comando en `devinotes/app/core/db.py` | 19 |
+| `websockets` | Protocolo del chat en `websocket/`. Ya lo instala uvicorn. No hace falta otro `pip install` | 21 |
 
 `pwdlib` y `passlib` son dos paquetes distintos. El código de la clase importa
 `pwdlib`. `passlib` queda instalado para tenerlo en el proyecto.

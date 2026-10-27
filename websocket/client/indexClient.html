@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>MiniChat WebSocket</title>
+  <!-- En el gist la hoja de estilos se pedía como styles.css. El archivo del gist se llama cssClient.css. -->
+  <link rel="stylesheet" href="cssClient.css" />
+</head>
+<body>
+  <div class="chat-container">
+    <div class="chat-header">
+      <div class="chat-title">MiniChat WebSocket</div>
+      <div class="user-info">
+        Usuario: <span id="usernameLabel"></span>
+      </div>
+    </div>
+
+    <div id="messages"></div>
+
+    <div class="input-row">
+      <!-- El gist no tiene label. El placeholder no cuenta: un lector de
+           pantalla no lo anuncia como nombre del campo. for="msgInput"
+           ata esta etiqueta al input de abajo. visually-hidden la saca
+           de la vista y la deja para el lector. -->
+      <label class="visually-hidden" for="msgInput">Mensaje</label>
+      <input id="msgInput" type="text" placeholder="Escribe un mensaje y presiona Enter..." />
+      <button id="sendBtn">Enviar</button>
+    </div>
+  </div>
+
+  <!-- El gist no trae esta etiqueta: el JS no se ejecutaba.
+       Va al final del body para que messages, msgInput y sendBtn ya existan. -->
+  <script src="scriptClient.js"></script>
+</body>
+</html>

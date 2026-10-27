@@ -4,13 +4,13 @@
 #   ../.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8001
 # El blog sigue en el 8000.
 #
-# asynccontextmanager → biblioteca estándar. lifespan corre init_db al subir
-#   y el yield es el tiempo en que la API atiende.
+# asynccontextmanager → biblioteca estándar. lifespan es el arranque de la API.
 # load_dotenv         → python-dotenv. Carga devinotes/.env si existe.
 # FastAPI             → la app.
 # CORSMiddleware      → starlette, reexportado por FastAPI. El front puede llamar.
 # settings            → título, de core/config.py.
-# init_db             → crea las tablas. core/db.py.
+# init_db             → sección 17 lo llamaba acá y creaba tablas.
+#   Sección 18: las tablas las arma Alembic antes de levantar el servidor.
 
 from contextlib import asynccontextmanager
 
@@ -22,17 +22,22 @@ from app.api.routers.labels_router import router as labels_router
 from app.api.routers.notes_router import router as notes_router
 from app.api.routers.shares_router import router as shares_router
 from app.core.config import settings
-from app.core.db import init_db
 from fastapi import FastAPI
+
+# from app.core.db import init_db
 
 load_dotenv()
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # async porque asynccontextmanager lo pide. init_db no espera nada:
-    # es create_all, síncrono. No hay await.
-    init_db()
+    # async porque asynccontextmanager lo pide. No hay await.
+    # Sección 17:
+    #     init_db()
+    # Sección 18, la clase deja comentado también el if de entorno:
+    #     if settings.ENVIRONMENT == "DEV":
+    #         init_db()
+    # Antes de este proceso: alembic upgrade head (comandos en core/db.py).
     yield
 
 

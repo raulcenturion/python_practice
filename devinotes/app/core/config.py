@@ -40,6 +40,12 @@ class Settings(BaseSettings):
     # 60 * 24 = un día en minutos. La clase lo escribe igual, en el default del Field.
     JWT_EXPIRES_MIN: int = 60 * 24
     PROJECT_NAME: str = "Devinote"
+    # La sección 18 lo pide obligatorio, en Pydantic 1:
+    #   ENVIRONMENT: str = Field(..., env="ENVIRONMENT")
+    # Field(..., env=) revienta en Pydantic 2, igual que el resto de esta clase.
+    # Default DEV para poder arrancar sin un .env nuevo.
+    # La clase iba a usarlo para create_all solo en DEV, y después dejó ese if comentado.
+    ENVIRONMENT: str = "DEV"
 
 
 # Se arma al importar el módulo. db.py lee settings.DATABASE_URL.

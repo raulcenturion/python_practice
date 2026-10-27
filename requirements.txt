@@ -56,6 +56,18 @@ sqlmodel==0.0.48
 # pydantic-settings lee el .env de Devinote (BaseSettings en devinotes/app/core/config.py).
 # El gist lo fija en 2.11.0. En este venv ya estaba 2.15.0, compatible con pydantic 2.13.
 pydantic-settings==2.15.0
+# Sección 18, devinotes/. pip install alembic
+# Migra las tablas (alembic upgrade head). Instala Mako, la plantilla de las revisiones.
+# El gist de la clase no lo fija. 1.20.1 corre con el SQLAlchemy 2.1 de este venv.
+# La sección 19 escribe alembic==1.17.1 y Mako==1.3.10. No se bajan:
+# 1.17 pide un Mako más viejo y este venv ya resolvió Mako 1.4.3 con Alembic 1.20.1.
+alembic==1.20.1
+# Sección 19. postgresql+psycopg:// importa este paquete. psycopg-binary trae
+# la librería compilada, sin necesitar pg_config en la máquina.
+# El requirements de esa rama no lo agrega; el gist de la 16 sí (3.2.11).
+psycopg[binary]==3.3.6
+# Sección 19. Proceso del servidor. La clase lo deja como `gunicorn`, sin versión.
+gunicorn==26.2.0
 uvicorn==0.52.4
 uvloop==0.22.1
 watchfiles==1.2.0

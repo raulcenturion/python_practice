@@ -23,10 +23,12 @@ class Label(SQLModel, table=True):
 
 class NoteLabelLink(SQLModel, table=True):
     __tablename__ = "note_label_link"
-    # La clase pone name="uq_label_owner_name", el mismo nombre que en Label.
+    # La sección 16 pone name="uq_label_owner_name", el mismo nombre que en Label.
     # En Postgres el nombre de un constraint es único en el esquema, y
-    # create_all falla al repetirlo. uq_note_label nombra el par nota+etiqueta.
-    __table_args__ = (UniqueConstraint("note_id", "label_id", name="uq_note_label"),)
+    # create_all falla al repetirlo. Acá se usó uq_note_label.
+    # La migración de la sección 18 lo llama uq_note_label_link. El modelo
+    # usa ese nombre para que autogenerate no pida otro rename.
+    __table_args__ = (UniqueConstraint("note_id", "label_id", name="uq_note_label_link"),)
 
     id: int | None = Field(default=None, primary_key=True)
     note_id: int = Field(foreign_key="note.id", index=True)
