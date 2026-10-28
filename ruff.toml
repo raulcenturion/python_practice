@@ -18,6 +18,8 @@
 "fastapi/app/**/*.py" = ["B008", "E501", "E402"]
 # Devinote (sección 16): mismos comentarios largos que la app de la clase.
 "devinotes/**/*.py" = ["E501"]
+# Webhooks: Depends() en el default es el patrón de FastAPI, igual que en el blog.
+"webhooks/**/*.py" = ["B008"]
 # Las prácticas se llaman 00_*.py a propósito. N999 no acepta un nombre que empieza con número.
 "fastApi/00_*.py" = ["N999"]
 "fastapi/00_*.py" = ["N999"]

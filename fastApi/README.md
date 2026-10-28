@@ -113,6 +113,7 @@ Estos los pide la clase y no vienen con Python:
 | `psycopg[binary]` | Driver de Postgres. La URL de deploy queda `postgresql+psycopg://` | 19 |
 | `gunicorn` | Proceso del servidor. Varios workers de uvicorn. Comando en `devinotes/app/core/db.py` | 19 |
 | `websockets` | Protocolo del chat en `websocket/`. Ya lo instala uvicorn. No hace falta otro `pip install` | 21 |
+| `httpx` | POST al canal de Discord en `webhooks/app/notifications.py`. Ya estaba instalado | webhooks |
 
 `pwdlib` y `passlib` son dos paquetes distintos. El código de la clase importa
 `pwdlib`. `passlib` queda instalado para tenerlo en el proyecto.

@@ -72,3 +72,8 @@ uvicorn==0.52.4
 uvloop==0.22.1
 watchfiles==1.2.0
 websockets==17.1
+# Clase de webhooks (carpeta webhooks/). El requirements de
+# ricardocuellar/Devtalles-Fastapi-Webhooks fija fastapi==0.135.2,
+# SQLAlchemy==2.0.48 y sqlmodel==0.0.37. No se instala esa lista:
+# bajaría fastapi, SQLAlchemy y sqlmodel de este venv.
+# La app usa fastapi, sqlmodel, httpx y python-dotenv, que ya están arriba.

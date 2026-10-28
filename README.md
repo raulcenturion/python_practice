@@ -23,6 +23,7 @@ Lecciones/
 fastApi/           → teorías y prácticas de FastAPI (siguiente etapa)
 devinotes/         → secciones 16 a 19, app nueva con SQLModel, Alembic y deploy
 websocket/         → sección 21, chat por WebSocket (proyecto aparte)
+webhooks/          → GitHub avisa por POST y se puede reenviar a Discord (proyecto aparte)
 ```
 
 Cada lección:
@@ -98,7 +99,7 @@ Detalle en `Lecciones/integradores/README.md`.
 
 El entorno es el `.venv` de la raíz. Los comandos de abajo usan esa ruta y hay que correrlos **dentro de la carpeta de cada app**. Desde la raíz, `app` puede ser el blog o Devinote, y uvicorn no sabe cuál abrir.
 
-Cada servidor tiene su puerto. Se pueden tener los tres abiertos a la vez.
+Cada servidor tiene su puerto. Se pueden tener abiertos a la vez.
 
 | App | Puerto | Para qué |
 |-----|--------|----------|
@@ -106,6 +107,7 @@ Cada servidor tiene su puerto. Se pueden tener los tres abiertos a la vez.
 | Devinote (`devinotes/`) | 8001 | SQLModel, secciones 16 a 19. Swagger: http://127.0.0.1:8001/docs |
 | Chat WebSocket (`websocket/`) | 8002 | Sección 21. Página: http://127.0.0.1:8002/ |
 | Eco WebSocket (`websocket/echo.py`) | 8003 | El mismo curso, el ejemplo corto. Socket: `ws://127.0.0.1:8003/ws/echo` |
+| Webhooks (`webhooks/`) | 8004 | GitHub avisa un issue nuevo. Swagger: http://127.0.0.1:8004/docs |
 | Front de CORS (`cors-demo/`) | 3000 | Prueba el middleware del blog |
 
 ```bash
@@ -128,6 +130,13 @@ cd websocket
 # Eco, en otra terminal, también desde websocket/
 ../.venv/bin/python -m uvicorn echo:app --host 127.0.0.1 --port 8003
 
+# Webhooks. GitHub hace POST /webhooks/github. GET /issues lista lo guardado.
+# Sin .env usa el secreto de práctica de app/github_webhook.py.
+# Para un webhook real, el mismo secreto va en GitHub (campo Secret) y en webhooks/.env.
+# Discord es opcional: sin DISCORD_WEBHOOK_URL el issue se guarda igual.
+cd webhooks
+../.venv/bin/python -m uvicorn app.main:app --host 127.0.0.1 --port 8004
+
 # Front que pega al blog para probar CORS. Pide Node 22 (hay .nvmrc).
 cd cors-demo
 nvm use
@@ -135,6 +144,49 @@ npm run dev
 ```
 
 Sin `?username=` el chat pide el nombre con un cuadro. Con `http://127.0.0.1:8002/?username=Ana` entra directo. Dos pestañas con dos nombres se ven entre sí.
+
+GitHub no puede llamar a `127.0.0.1`. El curl de abajo firma el body como lo hace GitHub y pega al 8004 ya levantado. Un issue con el mismo `id` responde ok y no se duplica. Sin el header de la firma, la respuesta es 401.
+
+```bash
+# Firma inválida, con el servidor del 8004 ya levantado.
+curl -i -X POST http://127.0.0.1:8004/webhooks/github \
+  -H "Content-Type: application/json" \
+  -H "X-GitHub-Event: issues" \
+  -d '{"action":"opened"}'
+
+# Issue firmado. El secreto lo lee el propio módulo.
+cd webhooks
+../.venv/bin/python - <<'PY'
+import hashlib, hmac, json, urllib.request
+from app.github_webhook import github_secret
+
+payload = {
+    "action": "opened",
+    "issue": {
+        "id": 1,
+        "title": "Hola",
+        "html_url": "https://github.com/ejemplo/repo/issues/1",
+        "state": "open",
+        "created_at": "2026-01-20T10:00:00Z",
+    },
+}
+body = json.dumps(payload).encode()
+sig = hmac.new(github_secret().encode(), body, hashlib.sha256).hexdigest()
+req = urllib.request.Request(
+    "http://127.0.0.1:8004/webhooks/github",
+    data=body,
+    headers={
+        "Content-Type": "application/json",
+        "X-Hub-Signature-256": f"sha256={sig}",
+        "X-GitHub-Event": "issues",
+    },
+    method="POST",
+)
+print(urllib.request.urlopen(req).read().decode())
+PY
+
+curl http://127.0.0.1:8004/issues
+```
 
 ```bash
 # Devinote. python -m app ya no crea tablas: init_db quedó en pass.
@@ -196,7 +248,7 @@ pip install -r requirements.txt
 python Lecciones/fundamentos/01_print_comentarios/practica.py
 ```
 
-Los `pip install` de cada clase (`pwdlib[argon2]`, `passlib`, `sqlmodel`, `alembic`, `gunicorn`, `psycopg`) ya están pinneados en `requirements.txt` y en la tabla de `fastapi/README.md`. No hace falta correrlos sueltos.
+Los `pip install` de cada clase (`pwdlib[argon2]`, `passlib`, `sqlmodel`, `alembic`, `gunicorn`, `psycopg`) ya están pinneados en `requirements.txt` y en la tabla de `fastapi/README.md`. No hace falta correrlos sueltos. La clase de webhooks no agrega paquetes: su `requirements.txt` bajaría fastapi y sqlmodel, y no se instala.
 
 ## FastAPI
 
