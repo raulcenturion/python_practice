@@ -2,6 +2,8 @@
 
 Las prácticas `00_*.py` viven en esta raíz. La clase modular vive en `app/`.
 
+Las capas de este `app/` y las de Devinote, lado a lado, están en [`ESTRUCTURA.md`](../ESTRUCTURA.md), en la raíz del repo.
+
 | Tipo | Nombre | Ejemplo |
 |------|--------|---------|
 | Práctica del proyecto | `00_`, `01_`, … | `00_hola_teoria.py`, `00_hola_practica.py`, `00_hola_main.py` |

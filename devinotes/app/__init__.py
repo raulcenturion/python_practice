@@ -1,4 +1,5 @@
 # Devinote. App aparte de fastapi/.
+# Capas, librerías y la diferencia con el blog: ESTRUCTURA.md, en la raíz del repo.
 # Sección 16: core, models y repositories. Arma las tablas.
 # Sección 17: services, routers y main.py. La API HTTP.
 # Sección 18: Alembic. create_all queda comentado.

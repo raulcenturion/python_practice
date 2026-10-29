@@ -26,6 +26,8 @@ websocket/         → sección 21, chat por WebSocket (proyecto aparte)
 webhooks/          → GitHub avisa por POST y se puede reenviar a Discord (proyecto aparte)
 ```
 
+El blog (`fastapi/app`) y Devinote (`devinotes/app`) están explicados en [`ESTRUCTURA.md`](ESTRUCTURA.md): carpetas, qué hace cada capa, librerías, en qué se parecen y la diferencia entre SQLAlchemy y SQLModel, con enlaces a la documentación.
+
 Cada lección:
 
 ```text

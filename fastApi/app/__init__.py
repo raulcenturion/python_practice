@@ -10,6 +10,8 @@
 # se importa el módulo concreto (app.core.db, app.api.v1.posts.router).
 #
 # --- Arquitectura por capas en FastAPI ---
+# Comparado con Devinote (SQLModel, carpetas por capa): ESTRUCTURA.md
+# en la raíz del repo.
 #
 # Estructura recomendada:
 # app/
