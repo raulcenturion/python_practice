@@ -2,6 +2,8 @@
 
 Dos apps de FastAPI, las dos en capas. El recorrido es el mismo: la ruta recibe el HTTP, el servicio aplica la regla, el repositorio habla con la base y el modelo es la tabla. Cambian el agrupado de carpetas y el ORM.
 
+El próximo desarrollo sigue el modelo de Devinote. El contrato de capas, qué hace cada módulo y qué prácticas ya están en el código está en [Devinote: capas para el próximo desarrollo](#devinote-capas-para-el-próximo-desarrollo).
+
 | | Blog | Devinote |
 |---|---|---|
 | Carpeta | `fastapi/` (en git, `fastApi/`) | `devinotes/` |
@@ -161,18 +163,121 @@ devinotes/
 
 `models/__init__.py` importa las tablas en orden (user, note, label, share) para que las claves foráneas existan cuando Alembic lee el metadata.
 
-### Qué hace cada capa
+### Devinote: capas para el próximo desarrollo
 
-| Capa | Dónde | Qué hace |
+El framework HTTP es [FastAPI](https://fastapi.tiangolo.com/tutorial/bigger-applications/). Recibe el request, valida el body y elige el endpoint. Los datos los describe [SQLModel](https://sqlmodel.tiangolo.com/tutorial/fastapi/): por debajo es SQLAlchemy, y la validación del JSON es Pydantic. La configuración es [pydantic-settings](https://docs.pydantic.dev/latest/concepts/pydantic_settings/) (`BaseSettings`). El esquema de la base lo mueve [Alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html). Quien escucha el puerto es Uvicorn.
+
+Cada capa existe para que un cambio de regla no toque el SQL, y un cambio de base no toque las rutas.
+
+#### `main.py`
+
+Punto de entrada. Arma la app, el [lifespan](https://fastapi.tiangolo.com/advanced/events/), el middleware de CORS y monta los cuatro routers bajo `/api/v1`.
+
+El lifespan está vacío a propósito: arrancar no crea tablas. Eso lo hace Alembic antes de levantar el proceso. Cerrar tampoco tiene nada que apagar.
+
+No hay lógica de negocio en este archivo. No hay middleware de logging: el blog lo tiene en `fastapi/app/core/middleware.py`. En Devinote el único middleware es CORS, y está escrito en `main.py`.
+
+#### `api/`
+
+Routers y el cable que comparten.
+
+| Módulo | Por qué está |
+|---|---|
+| `routers/notes_router.py` | `GET/POST /notes`, `PATCH/DELETE /notes/{id}`. Llama a `NoteService` |
+| `routers/labels_router.py` | Lista, alta y baja de etiquetas. Llama a `LabelService` |
+| `routers/shares_router.py` | Comparte y deja de compartir. Llama a `ShareService` |
+| `routers/auth_router.py` | Registro, login y el formulario de Swagger. Llama a `AuthService` |
+| `deps.py` | `DBSession` abre la sesión del request. `CurrentUser` lee el Bearer y busca la fila |
+
+Un endpoint declara la URL, el status (201 al crear, 204 al borrar) y delega. Notas, etiquetas y shares no arman SQL ni reglas: `NoteService(db).create(...)`.
+
+`auth_router.py` arma `UserRepository(db)` y se lo pasa a `AuthService`. La consulta sigue en el repositorio. La ruta igual nombra la capa de persistencia. El patrón de notas es el que conviene copiar: el router solo ve el servicio, y el servicio arma sus repositorios.
+
+`deps.py` también llama a `UserRepository` para saber quién es el token. Es infraestructura de cada request, no una regla de negocio. No revisa `User.active`.
+
+#### `core/`
+
+Infraestructura. Si cambia el motor o el secreto, se toca acá.
+
+| Módulo | Por qué está |
+|---|---|
+| `config.py` | `Settings(BaseSettings)`. URL, JWT, nombre del proyecto, `ENVIRONMENT`. En Pydantic v2 la clase vive en `pydantic-settings`, no en `pydantic` |
+| `db.py` | Engine, `get_session`, y `normalize_database_url` (`postgres://` y `postgresql://` pasan a `postgresql+psycopg://`) |
+| `security.py` | Hash Argon2 (pwdlib) y el JWT (PyJWT, HS256) |
+
+No hay un `core/middleware.py`. CORS se registra en `main.py`.
+
+#### `models/`
+
+La forma de los datos. Con SQLModel, `table=True` es la tabla y, sin eso, la misma familia de clases valida el JSON.
+
+| Archivo | Tabla | JSON, sin `table=True` |
 |---|---|---|
-| Router | `api/routers/*_router.py` | URL y status. La sesión entra como `DBSession` |
-| Deps | `api/deps.py` | Abre la sesión y resuelve el usuario del token. Lo comparten las rutas |
-| Service | `app/services/` | Permisos, qué notas se ven, 403 y 404 |
-| Repository | `app/repositories/` | SQL y `commit`. `update` de notas hace `merge` y pide que la nota tenga id |
-| Models | `app/models/` | Tabla (`table=True`) y DTO (sin `table=True`) en el mismo archivo |
-| Core | `app/core/` | Settings, engine, hash y token |
+| `user.py` | `User` (`email`, hash, `active`) | `UserCreate` trae `password`. `UserRead` no trae el hash ni `active` |
+| `note.py` | `Note` | `NoteCreate`, `NoteUpdate`, `NoteRead`. `label_ids` no es columna |
+| `label.py` | `Label`, `NoteLabelLink` | `LabelCreate`, `LabelRead` |
+| `share.py` | `NoteShare`, `LabelShare` | `ShareRequest`. `ShareRole` es `read` o `edit` |
 
-El árbol que pedía la diapositiva es este: `api/` rutas, `services/` reglas, `repositories/` base, `models/` tabla y JSON, `core/` configuración. No hay carpeta `listeners`.
+El resto del código no inventa columnas: usa estas clases.
+
+#### `repositories/`
+
+El único lugar con `select`, `add`, `delete`, `merge` y `commit`. El servicio pide `get`, `list_owned` o `create`. No escribe SQL.
+
+`session.exec()` ya devuelve las filas cuando el `select` es un modelo. No se encadena `.scalars()`. `NoteRepository.update` hace `merge` y exige que la nota tenga `id`.
+
+El `commit` está en el repositorio. Una regla que escribe en dos repositorios confirma dos veces: crear una nota guarda la fila y, si vienen `label_ids`, el vínculo se confirma en un segundo `commit`.
+
+#### `services/`
+
+La regla de negocio. Usa repositorios y responde 400, 401, 403 o 404. El router no decide eso.
+
+| Servicio | Regla que aplica |
+|---|---|
+| `AuthService` | Mail repetido → 400. Clave que no cierra → 401. Arma el token con el id |
+| `NoteService` | Qué notas ve el usuario (dueño, share directo, share de una etiqueta). Editar pide rol `edit`. Borrar y cambiar etiquetas lo hace el dueño |
+| `LabelService` | Nombre repetido del mismo dueño → 400. Borrar una etiqueta ajena → 404 |
+| `ShareService` | Solo el dueño comparte o deja de compartir |
+
+`User.active` existe en la tabla y en la migración `fa5e26298a8d`. Ni `AuthService.login` ni `get_current_user` lo leen. Un usuario inactivo hoy entra igual. Esa regla, si hace falta, va en el servicio de auth (y en la dependencia, que es quien deja pasar el request).
+
+#### `alembic/`
+
+Evoluciona el esquema sin borrar la base. `create_all` crea lo que falta y no altera una tabla que ya existe.
+
+| Pieza | Por qué está |
+|---|---|
+| `alembic.ini` | Configuración del comando. La URL de la base queda comentada: la real la pone `env.py` |
+| `env.py` | Importa los modelos, toma `normalize_database_url` y compara ese metadata con la base |
+| `versions/0bd823c6c863_init_schema.py` | Crea user, note, label, link y shares |
+| `versions/fa5e26298a8d_add_field_active_to_user.py` | Agrega `user.active` con default en el servidor |
+
+Comandos y el cuándo usar Alembic: `devinotes/app/core/db.py`. Desde `devinotes/`, antes de uvicorn: `alembic upgrade head`.
+
+#### Flujo
+
+`PATCH /api/v1/notes/5` recorre las capas así:
+
+1. `main.py` ya montó el router en `/api/v1`.
+2. `notes_router.update_note` recibe el JSON. FastAPI lo valida con `NoteUpdate`. `deps.py` abre la sesión y resuelve `CurrentUser`.
+3. El router llama a `NoteService.update`.
+4. El servicio mira si la nota existe y si ese usuario puede editarla. Si no, 404 o 403, y no hay `UPDATE`.
+5. `NoteRepository` hace el `merge` contra el modelo `Note` y confirma.
+6. El router devuelve esa fila. FastAPI la serializa como `NoteRead`.
+
+#### Buenas prácticas
+
+| Práctica | En este código |
+|---|---|
+| Cada capa tiene un rol | Sí. La ruta no arma SQL. El repositorio no decide permisos |
+| Probar servicio y repositorio sin HTTP | El constructor recibe la sesión (`NoteService(db)`, `NoteRepository(db)`). Se puede abrir una sesión contra un sqlite de prueba y llamar al método. Este repo no trae esa carpeta de tests |
+| Sumar una entidad | Modelo, repositorio, servicio, router, una línea `include_router` en `main.py` y una revisión de Alembic. El resto de las rutas no se toca |
+| Cambiar de motor | La URL y el driver están en `core/db.py`. Los repositorios hablan SQLModel, el mismo código para SQLite y Postgres |
+
+Dos costuras, si el próximo desarrollo copia esta app:
+
+- El router de auth construye el repositorio. Notas, etiquetas y shares no lo hacen.
+- El `commit` vive en el repositorio. Una operación con dos escrituras no es una sola transacción.
 
 ### Funcionalidades
 
