@@ -8,7 +8,10 @@ Abrí una carpeta de lección (ej. `Lecciones/fundamentos/01_print_comentarios/`
 
 1. Leé `teoria.py` (o `teoria_*.py` si hay más de una)
 2. Resolvé `practica.py` en la misma carpeta
-3. Pasá a la lección siguiente (`02_...`, `03_...`)
+3. Seguí con `ejercicios.md` y `practica_extra.py`. El índice está en [`Lecciones/PRACTICAS.md`](Lecciones/PRACTICAS.md). El menú pide el número con `input()`. Uno solo: `./r 07 practica_extra 2`
+4. Pasá a la lección siguiente (`02_...`, `03_...`)
+
+Las prácticas de banco con FastAPI, Pydantic y SQLModel están en [`fastApi/practicas/BANCO.md`](fastApi/practicas/BANCO.md).
 
 ## Estructura
 

@@ -17,6 +17,12 @@ Desde la raíz del proyecto (`welcomePy`), con el venv activo:
 
 Sin Playwright, las lecciones 05 y 06 **no deben crashear**: importan con `try/except ImportError` y saltan el demo.
 
+Cada carpeta suma `ejercicios.md` y `practica_extra.py`. Las de Playwright no abren el navegador: trabajan el texto o la URL. Índice: [`../PRACTICAS.md`](../PRACTICAS.md).
+
+```bash
+./r scraping/01 practica_extra
+```
+
 ## Cómo correr
 
 ```bash

@@ -2,6 +2,12 @@
 
 Temas: `datetime` → HTTP/APIs → clases + cliente HTTP.
 
+Cada carpeta suma `ejercicios.md` y `practica_extra.py`. Índice: [`../PRACTICAS.md`](../PRACTICAS.md).
+
+```bash
+./r fechas/01 practica_extra
+```
+
 ## Cómo correr
 
 ```bash

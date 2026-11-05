@@ -2,6 +2,12 @@
 
 Challenges y ejercicios de razonamiento en Python (conteo, filtros, lookups, dicts, simulación).
 
+Cada carpeta suma `ejercicios.md` y `practica_extra.py`. Índice: [`../PRACTICAS.md`](../PRACTICAS.md).
+
+```bash
+./r logica/01 practica_extra
+```
+
 ## Cómo correr
 
 Desde la raíz del repo (`welcomePy`):

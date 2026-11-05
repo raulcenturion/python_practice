@@ -358,3 +358,107 @@ Las tablas no las crea el proceso de uvicorn. Antes de levantarlo: `alembic upgr
 | Cuándo crece | El módulo 16 lo deja como default de un FastAPI que va a crecer, porque el JSON ya no coincide con la fila | El mismo módulo lo recomienda para un CRUD chico. Acá el DTO igual está separado (`UserRead` no lleva la clave) |
 
 Pueden convivir en un mismo proceso: SQLModel usa el engine de SQLAlchemy. Lo que no conviene es declarar la misma tabla dos veces. En este repo no conviven: son dos carpetas y dos servidores. El detalle está en `fastapi/app/core/db.py`, después de `class Base`.
+
+## Lectura rápida — capas con SQLModel (Devinote)
+
+Una leída de cómo está armado `devinotes/`, por qué existe cada capa y un ejemplo que ya está en el código. La lógica de negocio es `services/`. No hay otra carpeta de lógica.
+
+```text
+main.py          arranca la app y monta los routers
+api/             recibe el HTTP y llama al servicio
+services/        la regla (permisos, 403, 404)
+repositories/    el SQL
+models/          la tabla y el JSON
+core/            base, secreto, hash
+alembic/         cambia el esquema sin borrar la base
+```
+
+Un `POST /api/v1/notes` baja así: `main.py` ya incluyó el router → `notes_router.create_note` → `NoteService.create` → `NoteRepository.create` → la fila `Note`.
+
+### main.py — arranque
+
+Solo inicializa. Carga el `.env`, arma `FastAPI` con el lifespan y el CORS, e incluye los cuatro routers bajo `/api/v1`.
+
+Por qué: el proceso tiene un solo lugar que dice qué está publicado. Si la regla de una nota cambiara, este archivo no se toca.
+
+Ejemplo, en `devinotes/app/main.py`: `API_V1 = "/api/v1"` y `app.include_router(notes_router, prefix=API_V1)`. El lifespan no crea tablas. Eso lo hace Alembic antes de levantar uvicorn.
+
+### api/ — rutas
+
+Recibe el HTTP. Declara el método, la URL, el status y el modelo de respuesta. Delega. No arma el `select` ni decide si el usuario puede ver la nota.
+
+Por qué: la ruta es el contrato hacia afuera. Se puede cambiar el SQL sin cambiar la URL.
+
+Ejemplos en `devinotes/app/api/routers/`:
+
+| Archivo | Qué publica | A quién llama |
+|---|---|---|
+| `notes_router.py` | `GET/POST /notes`, `PATCH/DELETE /notes/{id}` | `NoteService` |
+| `labels_router.py` | lista, alta y baja de etiquetas | `LabelService` |
+| `shares_router.py` | compartir nota o etiqueta | `ShareService` |
+| `auth_router.py` | registro, login y el form de Swagger | `AuthService` |
+
+`create_note` en `notes_router.py` hace esto y nada más: recibe `NoteCreate`, la sesión y el usuario del token, y devuelve `NoteService(db).create(user.id, payload)`. El 201 está en el decorador.
+
+`api/deps.py` es el cable común. `DBSession` abre la sesión del request. `CurrentUser` lee el Bearer, decodifica el JWT y busca la fila. Las cuatro rutas lo usan. No es una regla de negocio: es "quién llama".
+
+### services/ — lógica de negocio
+
+Aplica la regla y traduce el fallo a un status. Usa repositorios. No escribe SQL.
+
+Por qué: la misma regla se prueba sin HTTP. Si mañana el permiso cambia, se cambia el servicio y las rutas siguen iguales.
+
+Ejemplos en `devinotes/app/services/`:
+
+| Servicio | Regla |
+|---|---|
+| `NoteService.list_visible` | Una nota se ve si sos el dueño, si te la compartieron, o si te compartieron una etiqueta que la nota tiene |
+| `NoteService.update` | Sin nota: 404. Sin rol `edit`: 403. Cambiar etiquetas lo hace solo el dueño |
+| `NoteService.delete` | Borrar lo hace el dueño. Si no es suya, 404 |
+| `AuthService.register` | Mail repetido: 400. La clave se guarda hasheada |
+| `AuthService.login` | Clave que no cierra: 401. El token lleva el id en `sub` |
+| `LabelService.create` | Nombre repetido del mismo dueño: 400 |
+| `ShareService` | Solo el dueño comparte o deja de compartir |
+
+`User.active` está en la tabla y ningún servicio lo mira todavía. Si hiciera falta rechazar a un usuario inactivo, el lugar es `AuthService.login` y `get_current_user`.
+
+### repositories/ — persistencia
+
+El `select`, el `add`, el `delete`, el `merge` y el `commit`. El resto del programa no nombra la base.
+
+Por qué: cambiar de SQLite a Postgres se concentra en `core/` y en Alembic. Las consultas siguen siendo SQLModel.
+
+Ejemplo en `devinotes/app/repositories/note_repository.py`: `create` hace `add`, `commit` y `refresh`. `get` es `session.get(Note, note_id)`. `update` hace `merge` y exige que la nota tenga `id`. `session.exec()` ya devuelve las filas. No se le agrega `.scalars()`.
+
+### models/ — la forma de los datos
+
+Con SQLModel, `table=True` es la tabla. Sin `table=True`, la clase valida el JSON y no crea tabla.
+
+Por qué: `UserCreate` trae `password` y `UserRead` no trae el hash. La fila y la respuesta no son el mismo objeto, aunque vivan en el mismo archivo.
+
+Ejemplos en `devinotes/app/models/`:
+
+| Archivo | Tabla | JSON |
+|---|---|---|
+| `user.py` | `User` | `UserCreate`, `UserRead` |
+| `note.py` | `Note` | `NoteCreate`, `NoteUpdate`, `NoteRead` |
+| `label.py` | `Label`, `NoteLabelLink` | `LabelCreate`, `LabelRead` |
+| `share.py` | `NoteShare`, `LabelShare` | `ShareRequest` |
+
+`label_ids` está en `NoteCreate` y no es una columna de `note`. El vínculo lo guarda `NoteLabelLink`.
+
+### core/ — infraestructura
+
+Conexión, configuración y criptografía. No sabe qué es una nota.
+
+| Archivo | Para qué |
+|---|---|
+| `config.py` | `Settings`: URL, JWT, nombre, `ENVIRONMENT` |
+| `db.py` | Engine, `get_session`, y la URL `postgresql+psycopg://` |
+| `security.py` | Hash Argon2 y el JWT |
+
+### alembic/ — el esquema en el tiempo
+
+`create_all` crea lo que falta y no altera una tabla que ya existe. Alembic sí. `env.py` lee los modelos y la URL. `versions/` guarda cada cambio: `0bd823c6c863` crea el esquema y `fa5e26298a8d` agrega `user.active`.
+
+Por qué: se puede evolucionar `devinotes.db` sin perder las filas.

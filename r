@@ -8,6 +8,8 @@
 #   ./r 01                       → Lecciones/fundamentos/01_*/practica.py
 #   ./r 01 teoria                → Lecciones/fundamentos/01_*/teoria.py
 #   ./r 04 practica_operaciones  → Lecciones/fundamentos/04_*/practica_operaciones.py
+#   ./r 07 practica_extra        → Lecciones/fundamentos/07_*/practica_extra.py
+#   ./r logica/01 practica_extra → el practica_extra.py de esa lección
 #   ./r integradores/01          → Lecciones/integradores/01_*/practica.py
 #   ./r integradores/00 14b      → previo repaso, un ejercicio
 #   ./r logica/01                → Lecciones/logica/01_*/practica.py
@@ -57,7 +59,7 @@ arg2="${2:-practica}"
 
 # Ruta directa a un .py
 if [[ "$arg1" == *.py ]]; then
-  run_file "$arg1"
+  run_file "$arg1" "${@:2}"
 fi
 
 # practica / teoria en carpeta actual
@@ -88,10 +90,12 @@ if [[ "$arg1" =~ ^[0-9]{1,2}$ ]]; then
     run_file "${t[0]}"
   fi
 
-  # practica, practica_operaciones, u otro .py de la lección
+  # practica, practica_operaciones, u otro .py de la lección.
+  # ./r 07 practica_extra 2 corre solo el ejercicio 2.
+  extra=("${@:3}")
   target="${lesson_dir}${kind}.py"
   if [[ -f "$target" ]]; then
-    run_file "$target"
+    run_file "$target" "${extra[@]}"
   fi
 
   echo "No encontré ${kind}.py en ${lesson_dir}" >&2

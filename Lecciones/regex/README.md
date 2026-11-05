@@ -16,6 +16,12 @@ Cuatro lecciones cortas. En cada carpeta:
 | 03 | `03_quantifiers/` | `*` `+` `?` `{n}` `{n,m}` `{n,}` |
 | 04 | `04_sets/` | `[ ]`, rangos, `[^ ]`, demos username/email |
 
+Cada carpeta suma `ejercicios.md` y `practica_extra.py`. Índice: [`../PRACTICAS.md`](../PRACTICAS.md).
+
+```bash
+./r regex/01 practica_extra
+```
+
 ## Cómo correr
 
 Desde la **raíz del repo** (`welcomePy/`), con el venv del proyecto si existe:

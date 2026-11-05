@@ -59,6 +59,12 @@ Hacé estos **en orden**. Cada uno suma temas; el último simula el estilo FastA
 | 02 | Gestor de tareas | Medio | `02_gestor_tareas/` |
 | 03 | Mini API biblioteca | Difícil (+ tips) | `03_mini_api_biblioteca/` |
 
+Cada integrador también tiene `ejercicios.md` y `practica_extra.py`. El índice de todas las lecciones está en [`../PRACTICAS.md`](../PRACTICAS.md).
+
+```bash
+./r Lecciones/integradores/01_agenda_contactos/practica_extra.py
+```
+
 ## Cómo trabajar cada uno
 
 1. Leé `enunciado.md`

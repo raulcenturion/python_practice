@@ -20,6 +20,10 @@
 "devinotes/**/*.py" = ["E501"]
 # Webhooks: Depends() en el default es el patrón de FastAPI, igual que en el blog.
 "webhooks/**/*.py" = ["B008"]
+# La práctica extra agrega Lecciones/ al path y después importa el menú.
+"Lecciones/**/practica_extra.py" = ["E402"]
+"fastApi/practicas/**/practica.py" = ["E402"]
+"fastapi/practicas/**/practica.py" = ["E402"]
 # Las prácticas se llaman 00_*.py a propósito. N999 no acepta un nombre que empieza con número.
 "fastApi/00_*.py" = ["N999"]
 "fastapi/00_*.py" = ["N999"]
